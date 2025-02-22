@@ -1,13 +1,41 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+html,
+body {
+  background-color: #121212; /* Black background */
+  color: #fff; /* Optional: Set text color to white */
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overscroll-behavior: contain;
+}
+
+/* For WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 2px; /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: #121212; /* Track background color */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ffbd00; /* Scrollbar color */
+  border-radius: 5px; /* Rounded scrollbar */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ffbd00; /* Darker red on hover */
 }
