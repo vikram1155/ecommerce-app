@@ -52,7 +52,7 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
   return (
     <Box
       sx={{
-        width: 180,
+        width: 200,
         p: 2,
         backgroundColor: theme.black2,
         borderRight: `0.9px solid ${theme.yellow}`,
@@ -80,6 +80,7 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
             color: theme.yellow,
             "& .MuiSlider-thumb": { height: 12, width: 12 },
             "& .MuiSlider-track": { border: 0 },
+            width: "90%",
           }}
         />
 
@@ -92,7 +93,11 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
               "& .MuiOutlinedInput-notchedOutline": {
                 borderColor: `${theme.yellow} !important`,
               },
-              "& .MuiOutlinedInput-root": { color: theme.white, p: 0 },
+              "& .MuiOutlinedInput-root": {
+                color: theme.white,
+                p: 0,
+                fontSize: "14px",
+              },
             }}
             value={filters.priceRange[0]}
             onChange={(e) =>
@@ -110,7 +115,11 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
               "& .MuiOutlinedInput-notchedOutline": {
                 borderColor: `${theme.yellow} !important`,
               },
-              "& .MuiOutlinedInput-root": { color: theme.white, p: 0 },
+              "& .MuiOutlinedInput-root": {
+                color: theme.white,
+                p: 0,
+                fontSize: "14px",
+              },
             }}
             value={filters.priceRange[1]}
             onChange={(e) =>
@@ -146,11 +155,18 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
                     sx={{
                       color: theme.white,
                       "&.MuiCheckbox-root.Mui-checked": { color: theme.yellow },
+                      svg: {
+                        fontSize: "16px",
+                      },
                     }}
                   />
                 }
                 label={category}
-                sx={{ textTransform: "capitalize", color: theme.white }}
+                sx={{
+                  textTransform: "capitalize",
+                  color: theme.white,
+                  "& .MuiTypography-root": { fontSize: "14px" },
+                }}
               />
             ))}
           </FormGroup>

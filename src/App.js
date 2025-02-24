@@ -10,6 +10,7 @@ import Equipments from "./pages/Equipments";
 import Checkout from "./pages/Checkout";
 import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
+import ProductDetail from "./pages/ProductDetail";
 
 function App() {
   return (
@@ -20,10 +21,11 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/protein-store" element={<ProteinStore />} />
-            {/* <Route path="/calorie-tracker" element={<Calories />} />
-            <Route path="/nutrition" element={<Nutrition />} /> */}
             <Route path="/supplements" element={<Supplements />} />
             <Route path="/equipments" element={<Equipments />} />
+            <Route path="/protein-store/:id" element={<ProductDetail />} />
+            <Route path="/supplements/:id" element={<ProductDetail />} />
+            <Route path="/equipments/:id" element={<ProductDetail />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/profile" element={<Profile />} />

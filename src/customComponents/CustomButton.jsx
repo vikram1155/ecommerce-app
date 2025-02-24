@@ -8,11 +8,13 @@ function CustomButton({
   buttonText,
   sx,
   variant = "contained",
+  onClick = () => {},
 }) {
   return (
     <Button
       variant={variant}
       color="primary"
+      onClick={onClick}
       sx={{
         fontWeight: 600,
         display: "flex",

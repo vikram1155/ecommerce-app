@@ -3,6 +3,7 @@ import CustomFilterBox from "../customComponents/CustomFilterBox";
 import { Box, useMediaQuery } from "@mui/material";
 import CustomProductList from "../customComponents/CustomProductList";
 import { productList } from "../assets/data";
+import { getAllProducts } from "../apiCalls/api";
 
 function Equipments() {
   const isMobile = useMediaQuery("(max-width: 650px)");
@@ -58,6 +59,18 @@ function Equipments() {
     setEquipmentsList(filteredEquipmentList);
   }, [filters]);
 
+  useEffect(() => {
+    const getAllProductsFn = async () => {
+      try {
+        const allProducts = await getAllProducts();
+        console.log("a-p", allProducts);
+      } catch (error) {
+        console.error("Error gettings tasks:", error);
+      }
+    };
+    getAllProductsFn();
+  }, []);
+
   return (
     <Box>
       {!isMobile && (
@@ -67,7 +80,7 @@ function Equipments() {
           setFilters={setFilters}
         />
       )}
-      <Box ml={!isMobile && "230px"}>
+      <Box ml={!isMobile && "250px"}>
         {equipmentsList?.length && (
           <CustomProductList
             list={equipmentsList} // Pass the filtered list

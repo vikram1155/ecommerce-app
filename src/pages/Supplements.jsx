@@ -67,7 +67,7 @@ function Supplements() {
           setFilters={setFilters}
         />
       )}
-      <Box ml={!isMobile && "230px"}>
+      <Box ml={!isMobile && "250px"}>
         {supplementsList?.length && (
           <CustomProductList
             list={supplementsList}

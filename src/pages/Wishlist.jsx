@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { productList, proteinList, supplements } from "../assets/data";
 import { Box } from "@mui/material";
 import CustomProductCard from "../customComponents/CustomProductCard";
+import CustomTypography from "../customComponents/CustomTypography";
 
 function Wishlist() {
   const [wishList, setWishList] = useState([]);
@@ -11,6 +12,11 @@ function Wishlist() {
 
   return (
     <Box>
+      <CustomTypography
+        heading={true}
+        value={"WishList"}
+        sx={{ textAlign: "center", fontSize: "16px", fontWeight: 600, py: 2 }}
+      />
       {wishList.length ? (
         <Box
           sx={{

@@ -44,12 +44,12 @@ const Home = () => {
 
   const categories = [
     { name: "Equipments", routeTo: "/equipments", image: EquipmentsImage },
-    { name: "Supplements", routeTo: "/supplements", image: SupplementsImage },
     {
       name: "Protein Rich  Foods",
       routeTo: "/equipments",
       image: ProteinFoodsImage,
     },
+    { name: "Supplements", routeTo: "/supplements", image: SupplementsImage },
   ];
 
   const todaysDealProducts = [
@@ -320,7 +320,8 @@ const Home = () => {
                   <CustomTypography
                     heading={false}
                     value={`₹${
-                      todaysDealProduct.price - todaysDealProduct.price * 0.1
+                      todaysDealProduct.price -
+                      (todaysDealProduct.price * todaysDealProduct.offer) / 100
                     }`}
                     sx={{ fontWeight: 400, fontSize: "18px" }}
                   />

@@ -100,7 +100,12 @@ function Header() {
           </ListItemButton>
         </ListItem>
         <Box sx={{ pt: 2 }}></Box>
-
+        <ListItemComponent
+          key={"Equipments"}
+          routeTo={"/equipments"}
+          svg={Dumbbells}
+          heading={"Equipments"}
+        />
         <ListItemComponent
           key={"Protein Store"}
           routeTo={"/protein-store"}
@@ -112,12 +117,6 @@ function Header() {
           routeTo={"/supplements"}
           svg={WheyProtein}
           heading={"Supplements"}
-        />
-        <ListItemComponent
-          key={"Equipments"}
-          routeTo={"/equipments"}
-          svg={Dumbbells}
-          heading={"Equipments"}
         />
       </List>
     </Box>
@@ -186,9 +185,9 @@ function Header() {
       {/* display these if screen size > 768px  */}
       {!isMobile && (
         <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
+          <HeaderTypoGraphy routeTo="/equipments" value={"Equipments"} />
           <HeaderTypoGraphy routeTo="/protein-store" value={"Protein Store"} />
           <HeaderTypoGraphy routeTo="/supplements" value={"Supplements"} />
-          <HeaderTypoGraphy routeTo="/equipments" value={"Equipments"} />
         </Box>
       )}
 

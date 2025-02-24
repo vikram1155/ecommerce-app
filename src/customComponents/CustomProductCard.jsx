@@ -6,10 +6,14 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { theme } from "../utils/theme";
 import CustomTypography from "./CustomTypography";
 import CustomButton from "./CustomButton";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function CustomProductCard({ item }) {
   const [favorited, setFavorited] = useState(item.favorited);
+  const navigate = useNavigate();
+  const location = useLocation();
 
+  //JSX
   return (
     <Box
       sx={{
@@ -29,11 +33,17 @@ function CustomProductCard({ item }) {
           transition: "transform 300ms",
         },
       }}
+      onClick={() => {
+        navigate(`${location.pathname}/${item.id}`);
+      }}
     >
       {/* Favorite Icon */}
       <IconButton
         sx={{ position: "absolute", top: 8, right: 8, color: "red" }}
-        onClick={() => setFavorited(!favorited)}
+        onClick={(e) => {
+          e.stopPropagation();
+          setFavorited(!favorited);
+        }}
       >
         {favorited ? <FavoriteIcon /> : <FavoriteBorderIcon />}
       </IconButton>
@@ -74,7 +84,7 @@ function CustomProductCard({ item }) {
         />
 
         <Box display={"flex"} gap={1} alignItems={"center"}>
-          <CustomTypography
+          {/* <CustomTypography
             heading={false}
             value={`₹${item.price}`}
             sx={{ fontWeight: 600, fontSize: "14px" }}
@@ -83,12 +93,36 @@ function CustomProductCard({ item }) {
             heading={false}
             value={`${item.offer} Off`}
             sx={{ fontWeight: 600, fontSize: "12px" }}
+          /> */}
+          <CustomTypography
+            heading={false}
+            value={`${item.price + (item.price * item.offer) / 100}`}
+            sx={{
+              fontWeight: 400,
+              fontSize: "14px",
+              textDecoration: "line-through",
+              color: "grey !important",
+            }}
+          />
+          <CustomTypography
+            heading={false}
+            value={`₹${item.price}`}
+            sx={{ fontWeight: 400, fontSize: "18px" }}
+          />
+          <CustomTypography
+            heading={false}
+            value={`${item.offer}% Off`}
+            sx={{
+              fontWeight: 400,
+              fontSize: "14px",
+              color: `${theme.yellow} !important`,
+            }}
           />
         </Box>
 
         <CustomTypography
           heading={false}
-          value={`⭐ ${item.ratings} (${item.no_of_purchases})`}
+          value={`⭐ ${item.ratings} (${item.no_of_ratings})`}
           sx={{ fontWeight: 400, fontSize: "12px" }}
         />
         <br></br>
