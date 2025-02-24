@@ -11,6 +11,7 @@ import Checkout from "./pages/Checkout";
 import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
 import ProductDetail from "./pages/ProductDetail";
+import Admin from "./pages/Admin";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/admin" element={<Admin />} />
 
             <Route path="*" element={<h2>Page Not Found</h2>} />
           </Routes>

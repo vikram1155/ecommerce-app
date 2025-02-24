@@ -34,7 +34,7 @@ function CustomProductCard({ item }) {
         },
       }}
       onClick={() => {
-        navigate(`${location.pathname}/${item.id}`);
+        navigate(`${location.pathname}/${item.productId}`);
       }}
     >
       {/* Favorite Icon */}

@@ -1,54 +1,50 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Box, Typography, IconButton, Chip } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import { productList, supplements, proteinList } from "../assets/data";
+import { getAllProducts } from "../apiCalls/api";
 
 const COLORS = ["#FF0000", "#00C49F", "#FFBB28"]; // Red for Protein, Green for Carbs, Yellow for Fat
 
 function ProductDetail() {
   const { id } = useParams();
-  const location = useLocation();
-  const [allData, setAllData] = useState([]);
   const [product, setProduct] = useState(null);
   const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
-    const allProducts = [...productList, ...supplements, ...proteinList];
-    setAllData(allProducts);
-
-    const activeCategory = location.pathname.startsWith("/protein-store")
-      ? proteinList
-      : location.pathname.startsWith("/equipments")
-      ? productList
-      : supplements;
-
-    const selectedProduct = activeCategory.find(
-      (item) => item.id === parseInt(id)
-    );
-    setProduct(selectedProduct);
+    const getAllProductsFn = async () => {
+      try {
+        const response = await getAllProducts();
+        if (response?.data) {
+          setProduct(response?.data.find((item) => item.productId === id));
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+    getAllProductsFn();
   }, [id]);
 
   const toggleFavorite = () => {
     if (!product) return;
     setFavorites((prevFavorites) =>
-      prevFavorites.includes(product.id)
-        ? prevFavorites.filter((favId) => favId !== product.id)
-        : [...prevFavorites, product.id]
+      prevFavorites.includes(product.productId)
+        ? prevFavorites.filter((favId) => favId !== product.productId)
+        : [...prevFavorites, product.productId]
     );
   };
+
+  const nutritionData = [
+    { name: "Protein", value: product?.protein || 0 },
+    { name: "Carbs", value: product?.carbs || 0 },
+    { name: "Fat", value: product?.fat || 0 },
+  ];
 
   if (!product) {
     return <Typography>Loading...</Typography>;
   }
-
-  const nutritionData = [
-    { name: "Protein", value: product.protein || 0 },
-    { name: "Carbs", value: product.carbs || 0 },
-    { name: "Fat", value: product.fat || 0 },
-  ];
 
   return (
     <Box
@@ -88,7 +84,7 @@ function ProductDetail() {
         {/* Favorite Icon */}
         <Box sx={{ alignSelf: "flex-end" }}>
           <IconButton onClick={toggleFavorite} color="error">
-            {favorites.includes(product.id) ? (
+            {favorites.includes(product.productId) ? (
               <FavoriteIcon />
             ) : (
               <FavoriteBorderIcon />

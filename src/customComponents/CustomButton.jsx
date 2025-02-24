@@ -6,7 +6,7 @@ function CustomButton({
   iconSrc,
   altText,
   buttonText,
-  sx,
+  sx = {},
   variant = "contained",
   onClick = () => {},
 }) {

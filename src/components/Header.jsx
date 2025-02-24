@@ -4,6 +4,7 @@ import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import ShoppingCartRoundedIcon from "@mui/icons-material/ShoppingCartRounded";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
+import AdminPanelSettingsRoundedIcon from "@mui/icons-material/AdminPanelSettingsRounded";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -23,6 +24,7 @@ function Header() {
   const location = useLocation();
   const [open, setOpen] = React.useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const isAdmin = true;
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
@@ -215,6 +217,13 @@ function Header() {
             sx={{ fontSize: 20, cursor: "pointer", color: theme.yellow }}
           />
         </IconButton>
+        {isAdmin && (
+          <IconButton onClick={() => navigate("/admin")}>
+            <AdminPanelSettingsRoundedIcon
+              sx={{ fontSize: 20, cursor: "pointer", color: theme.yellow }}
+            />
+          </IconButton>
+        )}
       </Box>
 
       {/* display these if screen size < 768px  */}
