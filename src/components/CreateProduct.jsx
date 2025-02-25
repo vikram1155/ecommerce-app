@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { postProduct, updateProduct } from "../apiCalls/api";
 import { Box, IconButton } from "@mui/material";
 import { theme } from "../utils/theme";
@@ -5,24 +6,35 @@ import CustomTypography from "../customComponents/CustomTypography";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import CustomTextField from "../customComponents/CustomTextfield";
 import CustomButton from "../customComponents/CustomButton";
+import CustomSelect from "../customComponents/CustomSelect";
 
-const productFields = [
-  { name: "name", label: "Product Name" },
-  { name: "weight", label: "Weight" },
-  { name: "category", label: "Category" },
-  { name: "price", label: "Price", type: "number" },
-  { name: "ratings", label: "Ratings", type: "number" },
-  { name: "no_of_ratings", label: "Number of Ratings", type: "number" },
-  { name: "description", label: "Description" },
-  { name: "offer", label: "Offer (%)", type: "number" },
-  { name: "features", label: "Features" },
-  { name: "protein", label: "Protein", type: "number" },
-  { name: "carbs", label: "Carbs", type: "number" },
-  { name: "fat", label: "Fat", type: "number" },
-  { name: "veg_nonveg", label: "Veg/Non-Veg" },
-  { name: "etd", label: "Estimated Delivery Time", type: "number" },
-  { name: "type", label: "Type" },
-];
+const productFields = {
+  common: [
+    { name: "name", label: "Product Name" },
+    { name: "weight", label: "Weight" },
+    { name: "category", label: "Category" },
+    { name: "price", label: "Price", type: "number" },
+    { name: "ratings", label: "Ratings", type: "number" },
+    { name: "no_of_ratings", label: "Number of Ratings", type: "number" },
+    { name: "description", label: "Description" },
+    { name: "offer", label: "Offer (%)", type: "number" },
+    { name: "features", label: "Features" },
+    { name: "etd", label: "Estimated Delivery Time", type: "number" },
+  ],
+  supplements: [
+    { name: "protein", label: "Protein", type: "number" },
+    { name: "carbs", label: "Carbs", type: "number" },
+    { name: "fat", label: "Fat", type: "number" },
+  ],
+  proteinFoods: [
+    { name: "protein", label: "Protein", type: "number" },
+    { name: "carbs", label: "Carbs", type: "number" },
+    { name: "fat", label: "Fat", type: "number" },
+    { name: "veg_nonveg", label: "Veg/Non-Veg" },
+  ],
+};
+
+const typeOptions = ["Equipments", "Supplements", "Protein-Foods"];
 
 const CreateProduct = ({
   productData,
@@ -30,32 +42,55 @@ const CreateProduct = ({
   handleCloseModal,
   type,
 }) => {
-  const handleInputChange = (e) => {
-    setProductData({ ...productData, [e.target.name]: e.target.value });
+  useEffect(() => {
+    if (productData.type === "Equipments") {
+      setProductData((prev) => ({
+        ...prev,
+        protein: null,
+        carbs: null,
+        fat: null,
+        veg_nonveg: null,
+      }));
+    }
+    if (productData.type === "Supplements") {
+      setProductData((prev) => ({
+        ...prev,
+        veg_nonveg: null,
+      }));
+    }
+  }, [productData.type]);
+
+  const handleInputChange = (e, name) => {
+    setProductData({ ...productData, [name || e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (type === "create") {
-      try {
-        const response = await postProduct(productData);
-        console.log("Product Created:", response);
-        handleCloseModal();
-      } catch (error) {
-        console.error("Error creating product:", error);
-      }
-    }
-    if (type === "update") {
-      try {
-        const response = await updateProduct(
-          productData.productId,
-          productData
-        );
-        console.log("Product Created:", response);
-        handleCloseModal();
-      } catch (error) {
-        console.error("Error creating product:", error);
-      }
+    const finalProductData = {
+      ...productData,
+      ...(productData.type === "Equipments" && {
+        protein: 0,
+        carbs: 0,
+        fat: 0,
+        veg_nonveg: "null",
+      }),
+      ...(productData.type === "Supplements" && {
+        veg_nonveg: "null",
+      }),
+    };
+
+    try {
+      const response =
+        type === "create"
+          ? await postProduct(finalProductData)
+          : await updateProduct(finalProductData.productId, finalProductData);
+
+      handleCloseModal();
+    } catch (error) {
+      console.error(
+        `Error ${type === "create" ? "creating" : "updating"} product:`,
+        error
+      );
     }
   };
 
@@ -81,13 +116,9 @@ const CreateProduct = ({
       }}
     >
       <Box sx={{ p: 3, pb: 1 }}>
-        <Box
-          display={"flex"}
-          alignItems={"center"}
-          justifyContent={"space-between"}
-        >
+        <Box display="flex" alignItems="center" justifyContent="space-between">
           <CustomTypography
-            heading={true}
+            heading
             value={type === "create" ? "Create Product" : "Update Product"}
             sx={{ fontSize: "18px", fontWeight: 600 }}
           />
@@ -96,15 +127,47 @@ const CreateProduct = ({
           </IconButton>
         </Box>
 
-        {productFields.map(({ name, label, type }) => (
+        {productFields.common.map(({ name, label, type }) => (
           <CustomTextField
+            key={name}
             label={label}
             name={name}
-            value={productData[name]}
+            value={productData[name] || ""}
             onChange={handleInputChange}
             required
           />
         ))}
+        <CustomSelect
+          label="Type"
+          name="type"
+          value={productData.type}
+          onChange={handleInputChange}
+          options={typeOptions}
+        />
+
+        {productData.type === "Supplements" &&
+          productFields.supplements.map(({ name, label, type }) => (
+            <CustomTextField
+              key={name}
+              label={label}
+              name={name}
+              value={productData[name] || ""}
+              onChange={handleInputChange}
+              required
+            />
+          ))}
+
+        {productData.type === "Protein-Foods" &&
+          productFields.proteinFoods.map(({ name, label }) => (
+            <CustomTextField
+              key={name}
+              label={label}
+              name={name}
+              value={productData[name] || ""}
+              onChange={handleInputChange}
+              required
+            />
+          ))}
       </Box>
 
       <Box
@@ -112,8 +175,6 @@ const CreateProduct = ({
           position: "sticky",
           bottom: "0",
           width: "calc(100% - 48px)",
-          margin: "0",
-          justifyItems: "center",
           background: "#000",
           padding: "12px 24px",
           left: "0",
@@ -121,7 +182,7 @@ const CreateProduct = ({
         }}
       >
         <CustomButton
-          variant={"contained"}
+          variant="contained"
           altText={type === "create" ? "Create Product" : "Update Product"}
           buttonText={type === "create" ? "Create Product" : "Update Product"}
           onClick={handleSubmit}

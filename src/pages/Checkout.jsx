@@ -1,20 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { productList, proteinList, supplements } from "../assets/data";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import CustomTypography from "../customComponents/CustomTypography";
 import { theme } from "../utils/theme";
 import CustomButton from "../customComponents/CustomButton";
 import { useNavigate } from "react-router-dom";
+import { getAllProducts, updateProduct } from "../apiCalls/api";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setProductsRedux,
+  updateProductRedux,
+} from "../redux/allProductsSlice";
 
 function Checkout() {
-  const [wishList, setWishList] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    setWishList([...productList, ...supplements, ...proteinList]);
-  }, []);
-
-  // Filter items in cart
-  const cartItems = wishList.filter((item) => item.inCart);
+    const getAllProductsFn = async () => {
+      try {
+        const response = await getAllProducts();
+        if (response?.data) {
+          setCartItems(response.data.filter((item) => item.inCart));
+          dispatch(setProductsRedux(response.data));
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+    getAllProductsFn();
+  }, [dispatch]);
 
   // Calculate total price
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price, 0);
@@ -22,14 +36,39 @@ function Checkout() {
   const [buttonClick, setButtonClick] = useState(false);
   const [orderSuccessPage, setOrderSuccessPage] = useState(false);
   const navigate = useNavigate();
-  useEffect(() => {
-    setTimeout(() => {
-      setOrderSuccessPage(true);
+
+  const handleCheckout = async () => {
+    try {
+      const updatePromises = cartItems.map(async (cartItem) => {
+        let updatedData = {
+          ...cartItem,
+          inCart: false,
+        };
+
+        try {
+          await updateProduct(cartItem.productId, updatedData);
+          dispatch(updateProductRedux(cartItem.productId, updatedData));
+        } catch (error) {
+          console.error(
+            `Error updating cart item ${cartItem.productId}:`,
+            error
+          );
+        }
+      });
+
+      await Promise.all(updatePromises);
+
+      setButtonClick(true);
       setTimeout(() => {
-        navigate("/");
+        setOrderSuccessPage(true);
+        setTimeout(() => {
+          navigate("/");
+        }, 5000);
       }, 5000);
-    }, 5000);
-  }, [buttonClick, navigate]);
+    } catch (error) {
+      console.error("Checkout failed", error);
+    }
+  };
 
   // JSX
   return (
@@ -95,18 +134,61 @@ function Checkout() {
             <>
               {cartItems.map((item) => (
                 <Box
-                  key={item.id}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    py: 1,
-                  }}
+                  display={"flex"}
+                  gap={1}
+                  alignItems={"center"}
+                  justifyContent={"space-between"}
+                  pt={3}
                 >
-                  <CustomTypography heading={false} value={item.name} />
-                  <CustomTypography heading={false} value={item.price} />
+                  <Box display={"flex"} gap={1} flexDirection={"column"}>
+                    <Box display={"flex"} gap={1} alignItems={"center"}>
+                      <CustomTypography
+                        heading={true}
+                        value={item.name}
+                        sx={{ fontWeight: 400, fontSize: "18px" }}
+                      />
+                      <CustomTypography
+                        heading={true}
+                        value={`(${item.category})`}
+                        sx={{ fontWeight: 400, fontSize: "18px" }}
+                      />
+                    </Box>
+                    <CustomTypography
+                      heading={false}
+                      value={`Delivery in ${item.etd} day(s)`}
+                      sx={{ fontWeight: 400, fontSize: "16px" }}
+                    />
+                  </Box>
+
+                  <Box display={"flex"} gap={1} alignItems={"center"}>
+                    <CustomTypography
+                      heading={false}
+                      value={`${item.price + (item.price * item.offer) / 100}`}
+                      sx={{
+                        fontWeight: 400,
+                        fontSize: "14px",
+                        textDecoration: "line-through",
+                        color: "grey !important",
+                      }}
+                    />
+                    <CustomTypography
+                      heading={false}
+                      value={`₹${item.price}`}
+                      sx={{ fontWeight: 400, fontSize: "18px" }}
+                    />
+                    <CustomTypography
+                      heading={false}
+                      value={`${item.offer}% Off`}
+                      sx={{
+                        fontWeight: 400,
+                        fontSize: "14px",
+                        color: `${theme.yellow} !important`,
+                      }}
+                    />
+                  </Box>
                 </Box>
               ))}
+
               <Box
                 sx={{
                   display: "flex",
@@ -114,7 +196,7 @@ function Checkout() {
                   mt: 3,
                   fontWeight: "bold",
                   borderTop: "1px solid #ddd",
-                  pt: 3,
+                  py: 2,
                 }}
               >
                 <CustomTypography heading={false} value={"Total"} />
@@ -125,8 +207,8 @@ function Checkout() {
                 // iconSrc={<ShoppingCartIcon sx={{ fontSize: "16px" }} />}
                 altText={"Proceed to Payment"}
                 buttonText={"Proceed to Payment"}
-                sx={{ m: "auto", mt: 10 }}
-                onClick={() => setButtonClick(true)}
+                sx={{ m: "auto", mt: 4 }}
+                onClick={handleCheckout}
               />
             </>
           ) : (

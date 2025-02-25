@@ -1,15 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { productList, proteinList, supplements } from "../assets/data";
 import { Box } from "@mui/material";
 import CustomProductCard from "../customComponents/CustomProductCard";
 import CustomTypography from "../customComponents/CustomTypography";
+import { getAllProducts } from "../apiCalls/api";
 
 function Wishlist() {
   const [wishList, setWishList] = useState([]);
+
   useEffect(() => {
-    setWishList([...productList, ...supplements, ...proteinList]);
+    const getAllProductsFn = async () => {
+      try {
+        const response = await getAllProducts();
+        if (response?.data) {
+          setWishList(response.data); // Ensure it's set
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+    getAllProductsFn();
   }, []);
 
+  // JSX
   return (
     <Box>
       <CustomTypography
@@ -17,7 +29,9 @@ function Wishlist() {
         value={"WishList"}
         sx={{ textAlign: "center", fontSize: "16px", fontWeight: 600, py: 2 }}
       />
-      {wishList.length ? (
+      {Object.entries(wishList).filter(
+        ([key, value]) => value.favorited === true
+      ).length ? (
         <Box
           sx={{
             display: "grid",
@@ -33,11 +47,15 @@ function Wishlist() {
           {Object.entries(wishList)
             .filter(([key, value]) => value.favorited === true)
             .map(([key, value]) => (
-              <CustomProductCard key={value.id} item={value} />
+              <CustomProductCard
+                key={value.id}
+                item={value}
+                setFilteredProducts={setWishList}
+              />
             ))}
         </Box>
       ) : (
-        <></>
+        <>No Wish list</>
       )}
     </Box>
   );

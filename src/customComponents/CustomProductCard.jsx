@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Box, IconButton } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -7,9 +6,31 @@ import { theme } from "../utils/theme";
 import CustomTypography from "./CustomTypography";
 import CustomButton from "./CustomButton";
 import { useLocation, useNavigate } from "react-router-dom";
+import { updateProduct } from "../apiCalls/api";
 
-function CustomProductCard({ item }) {
-  const [favorited, setFavorited] = useState(item.favorited);
+function CustomProductCard({ item, setFilteredProducts }) {
+  // const [favorited, setFavorited] = useState(item.favorited);
+
+  const handleFavoriteButtonClick = async () => {
+    let updatedData = {
+      ...item,
+      favorited: !item.favorited,
+    };
+    try {
+      const response = updateProduct(item.productId, updatedData);
+
+      setFilteredProducts((prevList) =>
+        prevList.map((product) =>
+          product.productId === item.productId
+            ? { ...product, favorited: !product.favorited }
+            : product
+        )
+      );
+    } catch (error) {
+      console.log("Error updating favorited list", error);
+    }
+  };
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -42,10 +63,11 @@ function CustomProductCard({ item }) {
         sx={{ position: "absolute", top: 8, right: 8, color: "red" }}
         onClick={(e) => {
           e.stopPropagation();
-          setFavorited(!favorited);
+          // setFavorited(!favorited);
+          handleFavoriteButtonClick(item.productId);
         }}
       >
-        {favorited ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+        {item?.favorited ? <FavoriteIcon /> : <FavoriteBorderIcon />}
       </IconButton>
 
       {/* Product Image */}
@@ -84,16 +106,6 @@ function CustomProductCard({ item }) {
         />
 
         <Box display={"flex"} gap={1} alignItems={"center"}>
-          {/* <CustomTypography
-            heading={false}
-            value={`₹${item.price}`}
-            sx={{ fontWeight: 600, fontSize: "14px" }}
-          />
-          <CustomTypography
-            heading={false}
-            value={`${item.offer} Off`}
-            sx={{ fontWeight: 600, fontSize: "12px" }}
-          /> */}
           <CustomTypography
             heading={false}
             value={`${item.price + (item.price * item.offer) / 100}`}
@@ -131,7 +143,7 @@ function CustomProductCard({ item }) {
           variant="contained"
           iconSrc={<ShoppingCartIcon sx={{ fontSize: "16px" }} />}
           altText={"Shopping Cart"}
-          buttonText={"Add to Cart"}
+          buttonText={"View Product"}
         />
       </Box>
     </Box>

@@ -29,17 +29,24 @@ const FilterChip = ({ label, onRemove }) => (
   </Box>
 );
 
-function CustomProductList({ list, filters, setFilters }) {
+function CustomProductList({ list, filters, setFilters, setFilteredProducts }) {
   const handleRemoveFilter = (key, item) => {
     setFilters((prevFilters) => {
-      if (Array.isArray(prevFilters[key])) {
-        return {
-          ...prevFilters,
-          [key]: prevFilters[key].filter((i) => i !== item),
-        };
-      }
       const updatedFilters = { ...prevFilters };
-      delete updatedFilters[key];
+
+      if (Array.isArray(updatedFilters[key])) {
+        if (key === "priceRange") {
+          updatedFilters[key] =
+            item === prevFilters[key][0]
+              ? [prevFilters.minMax[0], prevFilters[key][1]]
+              : [prevFilters[key][0], prevFilters.minMax[1]];
+        } else {
+          updatedFilters[key] = updatedFilters[key].filter((i) => i !== item);
+        }
+      } else {
+        delete updatedFilters[key];
+      }
+
       return updatedFilters;
     });
   };
@@ -90,7 +97,10 @@ function CustomProductList({ list, filters, setFilters }) {
           }}
         >
           {list.map((listItem) => (
-            <CustomProductCard key={listItem.id} item={listItem} />
+            <CustomProductCard
+              item={listItem}
+              setFilteredProducts={setFilteredProducts}
+            />
           ))}
         </Box>
       ) : (

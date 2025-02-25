@@ -60,7 +60,6 @@ function Admin() {
   const handleDelete = async (productId) => {
     try {
       const response = await deleteProduct(productId);
-      console.log("a-r", response);
       window.location.reload();
     } catch (error) {
       console.error("Error deleting product:", error);

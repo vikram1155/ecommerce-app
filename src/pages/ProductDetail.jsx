@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Box, Typography, IconButton, Chip } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { getAllProducts } from "../apiCalls/api";
+import CustomButton from "../customComponents/CustomButton";
+import { useDispatch, useSelector } from "react-redux";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import RemoveIcon from "@mui/icons-material/Remove";
+import AddIcon from "@mui/icons-material/Add";
+import { theme } from "../utils/theme";
+import { addOrUpdateOrder } from "../redux/orderListSlice";
 
 const COLORS = ["#FF0000", "#00C49F", "#FFBB28"]; // Red for Protein, Green for Carbs, Yellow for Fat
 
@@ -12,6 +19,15 @@ function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [favorites, setFavorites] = useState([]);
+  const [quantity, setQuantity] = useState(1);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const currentUser = {
+    id: "1",
+    email: "abc@abc.com",
+  };
 
   useEffect(() => {
     const getAllProductsFn = async () => {
@@ -36,6 +52,35 @@ function ProductDetail() {
     );
   };
 
+  const handleQuantityChange = (type) => {
+    setQuantity((prev) =>
+      type === "increase" ? prev + 1 : Math.max(1, prev - 1)
+    );
+  };
+
+  const handleAddToCart = () => {
+    if (!product) return;
+    if (!product.inCart) {
+      const currentDate = new Date();
+      const etdDate = new Date();
+      etdDate.setDate(currentDate.getDate() + product.etd);
+
+      const order = {
+        userId: currentUser.id,
+        userEmail: currentUser.email,
+        productId: product.productId,
+        quantity,
+        orderedOn: currentDate.toISOString(),
+        etd: etdDate.toISOString(),
+        status: etdDate > currentDate ? "In Progress" : "Completed",
+      };
+
+      dispatch(addOrUpdateOrder(order));
+      navigate("/checkout");
+    } else {
+      navigate("/checkout");
+    }
+  };
   const nutritionData = [
     { name: "Protein", value: product?.protein || 0 },
     { name: "Carbs", value: product?.carbs || 0 },
@@ -113,6 +158,48 @@ function ProductDetail() {
         <Typography variant="body1">
           {product.ratings} ⭐ ({product.no_of_ratings} purchases)
         </Typography>
+
+        {/* Quantity Selector */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            border: "1px solid gray",
+            borderRadius: "5px",
+            width: "fit-content",
+            padding: "5px",
+          }}
+        >
+          <IconButton
+            size="small"
+            onClick={() => quantity > 0 && handleQuantityChange("decrease")}
+          >
+            <RemoveIcon
+              fontSize="small"
+              sx={{ color: quantity > 1 ? theme.white : "#333" }}
+            />
+          </IconButton>
+          <Typography>{quantity}</Typography>
+          <IconButton
+            size="small"
+            onClick={() => quantity < 6 && handleQuantityChange("increase")}
+          >
+            <AddIcon
+              fontSize="small"
+              sx={{ color: quantity < 6 ? theme.white : "#333" }}
+            />
+          </IconButton>
+        </Box>
+
+        {/* Add to Cart Button */}
+        <CustomButton
+          variant="contained"
+          iconSrc={<ShoppingCartIcon sx={{ fontSize: "16px" }} />}
+          altText={"Shopping Cart"}
+          buttonText={product.inCart ? "Go To Cart" : "Add To Cart"}
+          onClick={handleAddToCart}
+        />
 
         {/* Description */}
         <Typography variant="body2" color="gray">

@@ -18,7 +18,6 @@ const accountInfo = {
   email: "johndoe@example.com",
   age: 28,
   phone: "+1 234 567 890",
-  admin: true,
 };
 
 const orderHistory = [
