@@ -5,7 +5,7 @@ import { theme } from "../utils/theme";
 import CustomButton from "../customComponents/CustomButton";
 import { useNavigate } from "react-router-dom";
 import { getAllProducts, updateProduct } from "../apiCalls/api";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   setProductsRedux,
   updateProductRedux,

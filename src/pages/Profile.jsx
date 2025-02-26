@@ -12,14 +12,6 @@ import {
 } from "@mui/material";
 import { theme } from "../utils/theme";
 
-const accountInfo = {
-  name: "John Doe",
-  id: "JD12345",
-  email: "johndoe@example.com",
-  age: 28,
-  phone: "+1 234 567 890",
-};
-
 const orderHistory = [
   {
     id: 1,
@@ -57,6 +49,7 @@ const orderHistory = [
 
 function Profile() {
   const [activeTab, setActiveTab] = useState(0);
+  const currentUser = JSON.parse(localStorage.getItem("userinfo"));
 
   return (
     <Box sx={{ maxWidth: 600, margin: "auto", mt: 4 }}>
@@ -102,25 +95,37 @@ function Profile() {
       {activeTab === 0 && (
         <Card sx={{ boxShadow: 3, backgroundColor: theme.grey }}>
           <CardContent sx={{ textAlign: "center", p: 0 }}>
-            {Object.entries(accountInfo).map(([key, value]) => (
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between", p: 3 }}
-              >
-                <Typography
-                  key={key}
-                  sx={{ textTransform: "capitalize", color: theme.white }}
+            {Object.entries(currentUser)
+              .filter(([key]) => key !== "admin")
+              .map(([key, value]) => (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    p: 3,
+                  }}
                 >
-                  <strong>{key.replace(/([A-Z])/g, " $1")}:</strong>
-                </Typography>
+                  <Typography
+                    key={key}
+                    sx={{
+                      textTransform: "capitalize",
+                      color: theme.white,
+                    }}
+                  >
+                    <strong>{key.replace(/([A-Z])/g, " $1")}:</strong>
+                  </Typography>
 
-                <Typography
-                  key={key}
-                  sx={{ textTransform: "capitalize", color: theme.white }}
-                >
-                  {value}
-                </Typography>
-              </Box>
-            ))}
+                  <Typography
+                    key={key}
+                    sx={{
+                      textTransform: key === "name" && "capitalize",
+                      color: theme.white,
+                    }}
+                  >
+                    {value}
+                  </Typography>
+                </Box>
+              ))}
           </CardContent>
         </Card>
       )}

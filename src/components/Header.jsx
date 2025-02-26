@@ -24,7 +24,7 @@ function Header() {
   const location = useLocation();
   const [open, setOpen] = React.useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const isAdmin = true;
+  const adminAccess = JSON.parse(localStorage.getItem("userinfo"));
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
@@ -217,7 +217,7 @@ function Header() {
             sx={{ fontSize: 20, cursor: "pointer", color: theme.yellow }}
           />
         </IconButton>
-        {isAdmin && (
+        {adminAccess && (
           <IconButton onClick={() => navigate("/admin")}>
             <AdminPanelSettingsRoundedIcon
               sx={{ fontSize: 20, cursor: "pointer", color: theme.yellow }}

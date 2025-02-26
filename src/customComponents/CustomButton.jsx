@@ -9,12 +9,14 @@ function CustomButton({
   sx = {},
   variant = "contained",
   onClick = () => {},
+  disabled = false,
 }) {
   return (
     <Button
       variant={variant}
       color="primary"
       onClick={onClick}
+      disabled={disabled}
       sx={{
         fontWeight: 600,
         display: "flex",
@@ -28,6 +30,11 @@ function CustomButton({
         ":hover": {
           color: theme.black,
           backgroundColor: theme.yellow,
+        },
+        "&.Mui-disabled": {
+          backgroundColor: theme.grey,
+          color: "#999",
+          opacity: 0.5,
         },
         ...sx,
       }}

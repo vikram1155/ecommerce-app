@@ -1,6 +1,11 @@
 import { Box } from "@mui/material";
 import "./App.css";
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import {
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+} from "react-router-dom";
 import About from "./pages/About";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
@@ -12,29 +17,138 @@ import Wishlist from "./pages/Wishlist";
 import Profile from "./pages/Profile";
 import ProductDetail from "./pages/ProductDetail";
 import Admin from "./pages/Admin";
+import { useState } from "react";
+import LoginPage from "./pages/LoginPage";
 
 function App() {
+  const [isAuthenticated, setAuthenticated] = useState(
+    localStorage.getItem("isAuthenticated") === "true"
+  );
+  const adminAccess = JSON.parse(localStorage.getItem("userinfo"));
+
   return (
     <Box>
       <Router>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/protein-store" element={<ProteinStore />} />
-            <Route path="/supplements" element={<Supplements />} />
-            <Route path="/equipments" element={<Equipments />} />
-            <Route path="/protein-store/:id" element={<ProductDetail />} />
-            <Route path="/supplements/:id" element={<ProductDetail />} />
-            <Route path="/equipments/:id" element={<ProductDetail />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/admin" element={<Admin />} />
-
-            <Route path="*" element={<h2>Page Not Found</h2>} />
-          </Routes>
-        </Layout>
+        <Routes>
+          {!isAuthenticated ? (
+            <>
+              <Route
+                path="/login"
+                element={<LoginPage setAuthenticated={setAuthenticated} />}
+              />
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </>
+          ) : (
+            <>
+              <Route
+                path="/"
+                element={
+                  <Layout>
+                    <Home />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/about"
+                element={
+                  <Layout>
+                    <About />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/protein-store"
+                element={
+                  <Layout>
+                    <ProteinStore />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/supplements"
+                element={
+                  <Layout>
+                    <Supplements />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/equipments"
+                element={
+                  <Layout>
+                    <Equipments />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/protein-store/:id"
+                element={
+                  <Layout>
+                    <ProductDetail />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/supplements/:id"
+                element={
+                  <Layout>
+                    <ProductDetail />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/equipments/:id"
+                element={
+                  <Layout>
+                    <ProductDetail />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/wishlist"
+                element={
+                  <Layout>
+                    <Wishlist />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/checkout"
+                element={
+                  <Layout>
+                    <Checkout />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <Layout>
+                    <Profile />
+                  </Layout>
+                }
+              />
+              {adminAccess?.admin === true && (
+                <Route
+                  path="/admin"
+                  element={
+                    <Layout>
+                      <Admin />
+                    </Layout>
+                  }
+                />
+              )}
+              <Route
+                path="*"
+                element={
+                  <Layout>
+                    <Navigate to="/" replace />
+                  </Layout>
+                }
+              />
+            </>
+          )}
+        </Routes>
       </Router>
     </Box>
   );

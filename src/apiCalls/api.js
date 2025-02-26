@@ -51,3 +51,31 @@ export const deleteProduct = async (productId) => {
     throw new Error("Failed to update product");
   }
 };
+
+// Users
+export const getAllUsersFromApi = async () => {
+  try {
+    const response = await api.get(API_ENDPOINTS.USERS);
+    return response.data;
+  } catch (error) {
+    throw new Error("Failed to fetch all users");
+  }
+};
+
+export const createUserApi = async (data) => {
+  try {
+    const response = await api.post(API_ENDPOINTS.USERS, data);
+    return response.data;
+  } catch (error) {
+    throw new Error("Failed to create user");
+  }
+};
+
+export const loginUserFromApi = async (data) => {
+  try {
+    const response = await api.post(API_ENDPOINTS.LOGIN, data);
+    return response.data;
+  } catch (error) {
+    throw new Error("Login failed");
+  }
+};
