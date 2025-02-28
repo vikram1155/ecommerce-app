@@ -16,6 +16,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import { theme } from "../utils/theme";
 import { addOrUpdateOrder } from "../redux/orderListSlice";
+import { showSnackbar } from "../redux/snackbarSlice";
 
 const COLORS = ["#FF0000", "#00C49F", "#FFBB28"]; // Red for Protein, Green for Carbs, Yellow for Fat
 
@@ -62,6 +63,13 @@ function ProductDetail() {
         favorite_products: updatedFavoritesList,
       });
       if (response?.status?.code === 200) {
+        dispatch(
+          showSnackbar(
+            favoritesList?.length && favoritesList?.includes(id)
+              ? "Removed from Wishlist!"
+              : "Added to Wishlist!"
+          )
+        );
         setFavoritesListFromLocal(updatedFavoritesList);
         localStorage.setItem(
           "userinfo",
@@ -101,6 +109,7 @@ function ProductDetail() {
       try {
         // CREATE - create cart items for an user
         const response = await postProductsInCartByUser(toBeAddedInCart);
+        dispatch(showSnackbar("Product Added to Cart!"));
         console.log("Cart update response:", response);
       } catch (error) {
         console.log("Error adding to cart:", error);

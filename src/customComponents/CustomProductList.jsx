@@ -5,6 +5,8 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { theme } from "../utils/theme";
 import CustomTypography from "./CustomTypography";
 import { getFavorites, updateFavorites } from "../apiCalls/api";
+import { useDispatch } from "react-redux";
+import { showSnackbar } from "../redux/snackbarSlice";
 
 const FilterChip = ({ label, onRemove }) => (
   <Box
@@ -70,6 +72,7 @@ function CustomProductList({ list, filters, setFilters, setFilteredProducts }) {
     fetchFavorites();
   }, []);
 
+  const dispatch = useDispatch();
   const handleFavoriteButtonClick = async (id) => {
     if (!currentUser) return;
 
@@ -82,6 +85,14 @@ function CustomProductList({ list, filters, setFilters, setFilteredProducts }) {
         favorite_products: updatedFavoritesList,
       });
       if (response?.status?.code === 200) {
+        dispatch(
+          showSnackbar(
+            favoritesListFromLocal?.length &&
+              favoritesListFromLocal?.includes(id)
+              ? "Removed from Wishlist!"
+              : "Added to Wishlist!"
+          )
+        );
         setFavoritesListFromLocal(updatedFavoritesList);
         localStorage.setItem(
           "userinfo",

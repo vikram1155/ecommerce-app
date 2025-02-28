@@ -12,6 +12,7 @@ import {
   removeCartItem,
 } from "../apiCalls/api";
 import { useDispatch } from "react-redux";
+import { showSnackbar } from "../redux/snackbarSlice";
 
 function Checkout() {
   const [cartItems, setCartItems] = useState([]);
@@ -133,6 +134,8 @@ function Checkout() {
     try {
       // UPDATE cart items after removing an item
       const response = await removeCartItem(currentUser.userId, id);
+      dispatch(showSnackbar("Product Removed from Cart!"));
+
       setProductsInCart(productsInCart.filter((p) => p.productId !== id));
     } catch (error) {
       console.log("Error removing item from cart:", error);

@@ -20,14 +20,24 @@ import Admin from "./pages/Admin";
 import { useState } from "react";
 import LoginPage from "./pages/LoginPage";
 
+import { useSelector } from "react-redux";
+import CustomSnackbar from "./components/CustomSnackbar";
+
 function App() {
   const [isAuthenticated, setAuthenticated] = useState(
     localStorage.getItem("isAuthenticated") === "true"
   );
   const adminAccess = JSON.parse(localStorage.getItem("userinfo"));
-
+  const snackbar = useSelector((state) => state.snackbar);
+  
+  // JSX
   return (
     <Box>
+      <CustomSnackbar
+        message={snackbar.message}
+        severity={snackbar.severity}
+        open={snackbar.open}
+      />
       <Router>
         <Routes>
           {!isAuthenticated ? (

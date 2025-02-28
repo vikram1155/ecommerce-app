@@ -3,6 +3,8 @@ import { Box } from "@mui/material";
 import CustomProductCard from "../customComponents/CustomProductCard";
 import CustomTypography from "../customComponents/CustomTypography";
 import { getAllProducts, getFavorites, updateFavorites } from "../apiCalls/api";
+import { useDispatch } from "react-redux";
+import { showSnackbar } from "../redux/snackbarSlice";
 
 function Wishlist() {
   const currentUser = JSON.parse(localStorage.getItem("userinfo"));
@@ -23,6 +25,7 @@ function Wishlist() {
     fetchFavorites();
   }, []);
 
+  const dispatch = useDispatch();
   const handleFavoriteButtonClick = async (id) => {
     if (!currentUser) return;
 
@@ -35,6 +38,14 @@ function Wishlist() {
         favorite_products: updatedFavoritesList,
       });
       if (response?.status?.code === 200) {
+        dispatch(
+          showSnackbar(
+            favoritesListFromLocal?.length &&
+              favoritesListFromLocal?.includes(id)
+              ? "Removed from Wishlist!"
+              : "Added to Wishlist!"
+          )
+        );
         setFavoritesListFromLocal(updatedFavoritesList);
         const filtered = wishList.filter((a) => a.productId !== id);
         setWishList(filtered);
