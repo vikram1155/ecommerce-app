@@ -1,9 +1,10 @@
 import { Box, IconButton } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CustomProductCard from "./CustomProductCard";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { theme } from "../utils/theme";
 import CustomTypography from "./CustomTypography";
+import { getFavorites, updateFavorites } from "../apiCalls/api";
 
 const FilterChip = ({ label, onRemove }) => (
   <Box
@@ -50,6 +51,54 @@ function CustomProductList({ list, filters, setFilters, setFilteredProducts }) {
       return updatedFilters;
     });
   };
+
+  const currentUser = JSON.parse(localStorage.getItem("userinfo"));
+  const [favoritesListFromLocal, setFavoritesListFromLocal] = useState(
+    currentUser?.favorites || []
+  );
+
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        const resp = await getFavorites(currentUser?.userId);
+        setFavoritesListFromLocal(resp?.data?.favorites || []);
+      } catch (error) {
+        console.error("Failed to fetch favorites:", error);
+      }
+    };
+    console.log("a-f1", favoritesListFromLocal);
+
+    fetchFavorites();
+  }, []);
+
+  const handleFavoriteButtonClick = async (id) => {
+    if (!currentUser) return;
+
+    const updatedFavoritesList =
+      favoritesListFromLocal?.length && favoritesListFromLocal?.includes(id)
+        ? favoritesListFromLocal.filter((favId) => favId !== id)
+        : [...(favoritesListFromLocal || []), id];
+    try {
+      const response = await updateFavorites(currentUser.userId, {
+        favorite_products: updatedFavoritesList,
+      });
+      if (response?.status?.code === 200) {
+        setFavoritesListFromLocal(updatedFavoritesList);
+        localStorage.setItem(
+          "userinfo",
+          JSON.stringify({
+            ...currentUser,
+            favorites: updatedFavoritesList,
+          })
+        );
+      }
+      console.log("Updated favorites:", response);
+    } catch (error) {
+      console.error("Failed to update favorites:", error);
+    }
+  };
+
+  console.log("a-f", favoritesListFromLocal);
 
   return (
     <Box>
@@ -100,6 +149,8 @@ function CustomProductList({ list, filters, setFilters, setFilteredProducts }) {
             <CustomProductCard
               item={listItem}
               setFilteredProducts={setFilteredProducts}
+              favoritesListFromLocal={favoritesListFromLocal}
+              handleFavoriteButtonClick={handleFavoriteButtonClick}
             />
           ))}
         </Box>

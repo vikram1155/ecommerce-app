@@ -4,4 +4,8 @@ export const API_ENDPOINTS = {
   PRODUCTS: "/products",
   USERS: "/users",
   LOGIN: "/login",
+  ORDERS: "/orders",
+  CART: "/cart",
+  CART_REMOVE: "/cart/remove",
+  FAVORITES: "/favorites",
 };

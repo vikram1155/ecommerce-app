@@ -4,7 +4,11 @@ import { Box, Typography, IconButton, Chip } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import { getAllProducts } from "../apiCalls/api";
+import {
+  getAllProducts,
+  postProductsInCartByUser,
+  updateFavorites,
+} from "../apiCalls/api";
 import CustomButton from "../customComponents/CustomButton";
 import { useDispatch } from "react-redux";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -24,10 +28,7 @@ function ProductDetail() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const currentUser = {
-    id: "1",
-    email: "abc@abc.com",
-  };
+  const currentUser = JSON.parse(localStorage.getItem("userinfo"));
 
   useEffect(() => {
     const getAllProductsFn = async () => {
@@ -43,13 +44,37 @@ function ProductDetail() {
     getAllProductsFn();
   }, [id]);
 
-  const toggleFavorite = () => {
-    if (!product) return;
-    setFavorites((prevFavorites) =>
-      prevFavorites.includes(product.productId)
-        ? prevFavorites.filter((favId) => favId !== product.productId)
-        : [...prevFavorites, product.productId]
-    );
+  const [favoritesListFromLocal, setFavoritesListFromLocal] = useState(
+    currentUser?.favorites
+  );
+
+  const handleFavoriteButtonClick = async (id) => {
+    if (!currentUser) return;
+
+    const favoritesList = currentUser?.favorites ?? [];
+
+    const updatedFavoritesList = favoritesList.includes(id)
+      ? favoritesList.filter((favId) => favId !== id)
+      : [...favoritesList, id];
+
+    try {
+      const response = await updateFavorites(currentUser.userId, {
+        favorite_products: updatedFavoritesList,
+      });
+      if (response?.status?.code === 200) {
+        setFavoritesListFromLocal(updatedFavoritesList);
+        localStorage.setItem(
+          "userinfo",
+          JSON.stringify({
+            ...currentUser,
+            favorites: updatedFavoritesList,
+          })
+        );
+      }
+      console.log("Updated favorites:", response);
+    } catch (error) {
+      console.error("Failed to update favorites:", error);
+    }
   };
 
   const handleQuantityChange = (type) => {
@@ -58,29 +83,33 @@ function ProductDetail() {
     );
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!product) return;
-    if (!product.inCart) {
-      const currentDate = new Date();
-      const etdDate = new Date();
-      etdDate.setDate(currentDate.getDate() + product.etd);
 
-      const order = {
-        userId: currentUser.id,
-        userEmail: currentUser.email,
-        productId: product.productId,
-        quantity,
-        orderedOn: currentDate.toISOString(),
-        etd: etdDate.toISOString(),
-        status: etdDate > currentDate ? "In Progress" : "Completed",
+    if (!product.inCart) {
+      const toBeAddedInCart = {
+        userId: currentUser.userId,
+        userEmail: currentUser.email, // Ensure email is sent
+        productsInCart: [
+          {
+            productId: product.productId,
+            quantity: quantity,
+          },
+        ],
       };
 
-      dispatch(addOrUpdateOrder(order));
-      navigate("/checkout");
-    } else {
-      navigate("/checkout");
+      try {
+        // CREATE - create cart items for an user
+        const response = await postProductsInCartByUser(toBeAddedInCart);
+        console.log("Cart update response:", response);
+      } catch (error) {
+        console.log("Error adding to cart:", error);
+      }
     }
+
+    navigate("/checkout");
   };
+
   const nutritionData = [
     { name: "Protein", value: product?.protein || 0 },
     { name: "Carbs", value: product?.carbs || 0 },
@@ -128,8 +157,11 @@ function ProductDetail() {
       >
         {/* Favorite Icon */}
         <Box sx={{ alignSelf: "flex-end" }}>
-          <IconButton onClick={toggleFavorite} color="error">
-            {favorites.includes(product.productId) ? (
+          <IconButton
+            onClick={() => handleFavoriteButtonClick(product?.productId)}
+            color="error"
+          >
+            {favoritesListFromLocal.includes(product.productId) ? (
               <FavoriteIcon />
             ) : (
               <FavoriteBorderIcon />

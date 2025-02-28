@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Tabs,
@@ -11,6 +11,7 @@ import {
   Divider,
 } from "@mui/material";
 import { theme } from "../utils/theme";
+import { getOrdersByUser } from "../apiCalls/api";
 
 const orderHistory = [
   {
@@ -50,7 +51,22 @@ const orderHistory = [
 function Profile() {
   const [activeTab, setActiveTab] = useState(0);
   const currentUser = JSON.parse(localStorage.getItem("userinfo"));
+  const [orderHistoryList, setOrderHistoryList] = useState([]);
 
+  useEffect(() => {
+    const getOrdersByUserFn = async () => {
+      try {
+        const response = await getOrdersByUser(currentUser?.userId);
+        setOrderHistoryList(response?.data);
+        console.log("A-r", response);
+      } catch (error) {
+        console.log("Error getting orders");
+      }
+    };
+    getOrdersByUserFn();
+  }, [currentUser?.userId]);
+
+  console.log("a-orderHistoryList", orderHistoryList?.ordersList);
   return (
     <Box sx={{ maxWidth: 600, margin: "auto", mt: 4 }}>
       {/* Tabs */}
@@ -96,7 +112,7 @@ function Profile() {
         <Card sx={{ boxShadow: 3, backgroundColor: theme.grey }}>
           <CardContent sx={{ textAlign: "center", p: 0 }}>
             {Object.entries(currentUser)
-              .filter(([key]) => key !== "admin")
+              .filter(([key]) => key !== "userId" && key !== "admin")
               .map(([key, value]) => (
                 <Box
                   sx={{
@@ -133,46 +149,61 @@ function Profile() {
       {activeTab === 1 && (
         <Box sx={{ boxShadow: 2, borderRadius: 2, background: theme.grey }}>
           <List>
-            {orderHistory.map((order, index) => (
-              <React.Fragment key={order.id}>
-                <ListItem
-                  sx={{
-                    p: 3,
-                    pb: 3.5,
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Box>
-                    <Typography variant="subtitle1" sx={{ color: theme.white }}>
-                      <strong>{order.productName}</strong> (x{order.quantity})
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      sx={{ color: theme.white }}
-                    >
-                      ₹{order.price} | Ordered on: {order.orderedOn}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <span
-                      style={{
-                        color:
-                          order.status === "Completed" ? "green" : "orange",
-                      }}
-                    >
-                      {order.status}
-                    </span>
-                  </Box>
-                </ListItem>
-                {index < orderHistory.length - 1 && (
-                  <Divider sx={{ bgcolor: theme.white }} />
-                )}
-              </React.Fragment>
-            ))}
+            {orderHistoryList?.ordersList?.length ? (
+              orderHistoryList?.ordersList?.map((order, index) => (
+                <React.Fragment key={order.id}>
+                  <ListItem
+                    sx={{
+                      p: 3,
+                      pb: 3.5,
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Box>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{ color: theme.white }}
+                      >
+                        <strong>{order.productName}</strong> (x{order.quantity})
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                        sx={{ color: theme.white }}
+                      >
+                        ₹{order.costWhenOrdered} | Ordered on:{" "}
+                        {new Date(order.orderedOnDate).toLocaleDateString(
+                          "en-GB",
+                          {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          }
+                        )}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <span
+                        style={{
+                          color:
+                            order.status === "Completed" ? "green" : "orange",
+                        }}
+                      >
+                        {order.status}
+                      </span>
+                    </Box>
+                  </ListItem>
+                  {index < orderHistoryList?.ordersList?.length - 1 && (
+                    <Divider sx={{ bgcolor: theme.white }} />
+                  )}
+                </React.Fragment>
+              ))
+            ) : (
+              <>No Orders</>
+            )}
           </List>
         </Box>
       )}

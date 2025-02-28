@@ -4,24 +4,60 @@ import CustomTypography from "../customComponents/CustomTypography";
 import { theme } from "../utils/theme";
 import CustomButton from "../customComponents/CustomButton";
 import { useNavigate } from "react-router-dom";
-import { getAllProducts, updateProduct } from "../apiCalls/api";
-import { useDispatch } from "react-redux";
 import {
-  setProductsRedux,
-  updateProductRedux,
-} from "../redux/allProductsSlice";
+  clearCartByUser,
+  getAllProducts,
+  getProductsInCartByUser,
+  postOrdersByUser,
+  removeCartItem,
+} from "../apiCalls/api";
+import { useDispatch } from "react-redux";
 
 function Checkout() {
   const [cartItems, setCartItems] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
+  const [productsInCart, setProductsInCart] = useState([]);
+  const [buttonClick, setButtonClick] = useState(false);
+  const [orderSuccessPage, setOrderSuccessPage] = useState(false);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const currentUser = JSON.parse(localStorage.getItem("userinfo"));
 
+  // Utils
+  const totalPrice = productsInCart.reduce(
+    (sum, item) => sum + item.quantity * item.price,
+    0
+  );
+
+  const totalPriceOffer = productsInCart.reduce(
+    (sum, item) =>
+      sum + item.quantity * (item.price + (item.price * item.offer) / 100),
+    0
+  );
+
+  // UseEffects
+  // GET cart items
+  useEffect(() => {
+    const getProductsInCartByUserFn = async () => {
+      try {
+        const allCartProducts = await getProductsInCartByUser(
+          currentUser?.userId
+        );
+        setCartItems(allCartProducts?.data);
+      } catch (error) {
+        console.log("Error feytching cart details");
+      }
+    };
+    getProductsInCartByUserFn();
+  }, [currentUser?.userId]);
+
+  // GET all products available
   useEffect(() => {
     const getAllProductsFn = async () => {
       try {
         const response = await getAllProducts();
         if (response?.data) {
-          setCartItems(response.data.filter((item) => item.inCart));
-          dispatch(setProductsRedux(response.data));
+          setAllProducts(response.data);
         }
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -30,43 +66,78 @@ function Checkout() {
     getAllProductsFn();
   }, [dispatch]);
 
-  // Calculate total price
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.price, 0);
+  useEffect(() => {
+    if (!cartItems?.productsInCart || !allProducts) return;
 
-  const [buttonClick, setButtonClick] = useState(false);
-  const [orderSuccessPage, setOrderSuccessPage] = useState(false);
-  const navigate = useNavigate();
+    const quantityMap = new Map();
+    cartItems.productsInCart.forEach((item) => {
+      quantityMap.set(item.productId, item.quantity);
+    });
 
+    const updatedProducts = allProducts
+      .filter((product) => quantityMap.has(product.productId))
+      .map((product) => ({
+        ...product,
+        quantity: quantityMap.get(product.productId) || 0,
+      }));
+
+    setProductsInCart(updatedProducts);
+  }, [cartItems, allProducts]);
+
+  // Handlers
   const handleCheckout = async () => {
     try {
-      const updatePromises = cartItems.map(async (cartItem) => {
-        let updatedData = {
-          ...cartItem,
-          inCart: false,
-        };
-
-        try {
-          await updateProduct(cartItem.productId, updatedData);
-          dispatch(updateProductRedux(cartItem.productId, updatedData));
-        } catch (error) {
-          console.error(
-            `Error updating cart item ${cartItem.productId}:`,
-            error
-          );
-        }
+      let cartList = [];
+      productsInCart.forEach((product) => {
+        cartList.push({
+          status: "In Progress",
+          orderedOnDate: new Date(),
+          costWhenOrdered: product.price,
+          productId: product.productId,
+          productName: product.name,
+          quantity: product.quantity,
+        });
       });
 
-      await Promise.all(updatePromises);
+      // CREATE Order for an user
+      const response = await postOrdersByUser({
+        userId: currentUser?.userId,
+        ordersList: cartList,
+      });
+      console.log("a-r", response);
 
-      setButtonClick(true);
-      setTimeout(() => {
-        setOrderSuccessPage(true);
-        setTimeout(() => {
-          navigate("/");
-        }, 5000);
-      }, 5000);
+      if (response.status.code === 200) {
+        try {
+          // UPDATE cart items = []
+          const clearCartResponse = await clearCartByUser({
+            userId: currentUser?.userId,
+            userEmail: currentUser?.email,
+            productsInCart: [],
+          });
+          console.log("a-removeCartItemsResponse", clearCartResponse);
+          setButtonClick(true);
+          setTimeout(() => {
+            setOrderSuccessPage(true);
+            setTimeout(() => {
+              navigate("/");
+            }, 5000);
+          }, 5000);
+        } catch (error) {
+          console.error("Failed to empty cart", error);
+        }
+      }
     } catch (error) {
-      console.error("Checkout failed", error);
+      console.error("Error during checkout", error);
+    }
+  };
+
+  const handleRemoveItem = async (id) => {
+    try {
+      // UPDATE cart items after removing an item
+      const response = await removeCartItem(currentUser.userId, id);
+      setProductsInCart(productsInCart.filter((p) => p.productId !== id));
+    } catch (error) {
+      console.log("Error removing item from cart:", error);
     }
   };
 
@@ -130,9 +201,9 @@ function Checkout() {
           >
             Checkout
           </Typography>
-          {cartItems.length > 0 ? (
+          {productsInCart?.length > 0 ? (
             <>
-              {cartItems.map((item) => (
+              {productsInCart?.map((item) => (
                 <Box
                   display={"flex"}
                   gap={1}
@@ -152,18 +223,32 @@ function Checkout() {
                         value={`(${item.category})`}
                         sx={{ fontWeight: 400, fontSize: "18px" }}
                       />
+                      <CustomTypography
+                        heading={false}
+                        value={`x ${item.quantity} item(s)`}
+                        sx={{ fontWeight: 400, fontSize: "16px" }}
+                      />
                     </Box>
                     <CustomTypography
                       heading={false}
                       value={`Delivery in ${item.etd} day(s)`}
                       sx={{ fontWeight: 400, fontSize: "16px" }}
                     />
+                    <CustomButton
+                      variant="contained"
+                      altText={"Remove Item"}
+                      buttonText={"Remove Item"}
+                      onClick={() => handleRemoveItem(item.productId)}
+                    />
                   </Box>
 
                   <Box display={"flex"} gap={1} alignItems={"center"}>
                     <CustomTypography
                       heading={false}
-                      value={`${item.price + (item.price * item.offer) / 100}`}
+                      value={`${
+                        item.quantity *
+                        (item.price + (item.price * item.offer) / 100)
+                      }`}
                       sx={{
                         fontWeight: 400,
                         fontSize: "14px",
@@ -173,7 +258,7 @@ function Checkout() {
                     />
                     <CustomTypography
                       heading={false}
-                      value={`₹${item.price}`}
+                      value={`₹${item.quantity * item.price}`}
                       sx={{ fontWeight: 400, fontSize: "18px" }}
                     />
                     <CustomTypography
@@ -200,11 +285,22 @@ function Checkout() {
                 }}
               >
                 <CustomTypography heading={false} value={"Total"} />
-                <CustomTypography heading={false} value={`₹ ${totalPrice}`} />
+                <Box display={"flex"} gap={1} alignItems={"center"}>
+                  <CustomTypography
+                    heading={false}
+                    value={totalPriceOffer}
+                    sx={{
+                      fontWeight: 400,
+                      fontSize: "14px",
+                      textDecoration: "line-through",
+                      color: "grey !important",
+                    }}
+                  />
+                  <CustomTypography heading={false} value={`₹ ${totalPrice}`} />
+                </Box>
               </Box>
               <CustomButton
                 variant="contained"
-                // iconSrc={<ShoppingCartIcon sx={{ fontSize: "16px" }} />}
                 altText={"Proceed to Payment"}
                 buttonText={"Proceed to Payment"}
                 sx={{ m: "auto", mt: 4 }}

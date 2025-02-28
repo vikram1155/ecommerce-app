@@ -6,34 +6,16 @@ import { theme } from "../utils/theme";
 import CustomTypography from "./CustomTypography";
 import CustomButton from "./CustomButton";
 import { useLocation, useNavigate } from "react-router-dom";
-import { updateProduct } from "../apiCalls/api";
 
-function CustomProductCard({ item, setFilteredProducts }) {
-  // const [favorited, setFavorited] = useState(item.favorited);
-
-  const handleFavoriteButtonClick = async () => {
-    let updatedData = {
-      ...item,
-      favorited: !item.favorited,
-    };
-    try {
-      const response = updateProduct(item.productId, updatedData);
-
-      setFilteredProducts((prevList) =>
-        prevList.map((product) =>
-          product.productId === item.productId
-            ? { ...product, favorited: !product.favorited }
-            : product
-        )
-      );
-    } catch (error) {
-      console.log("Error updating favorited list", error);
-    }
-  };
-
+function CustomProductCard({
+  item,
+  setFilteredProducts,
+  favoritesListFromLocal,
+  handleFavoriteButtonClick,
+}) {
   const navigate = useNavigate();
   const location = useLocation();
-
+  console.log("a-favoritesListFromLocal", favoritesListFromLocal);
   //JSX
   return (
     <Box
@@ -63,11 +45,14 @@ function CustomProductCard({ item, setFilteredProducts }) {
         sx={{ position: "absolute", top: 8, right: 8, color: "red" }}
         onClick={(e) => {
           e.stopPropagation();
-          // setFavorited(!favorited);
           handleFavoriteButtonClick(item.productId);
         }}
       >
-        {item?.favorited ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+        {favoritesListFromLocal.includes(item.productId) ? (
+          <FavoriteIcon />
+        ) : (
+          <FavoriteBorderIcon />
+        )}
       </IconButton>
 
       {/* Product Image */}
