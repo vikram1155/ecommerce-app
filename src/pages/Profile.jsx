@@ -58,7 +58,6 @@ function Profile() {
       try {
         const response = await getOrdersByUser(currentUser?.userId);
         setOrderHistoryList(response?.data);
-        console.log("A-r", response);
       } catch (error) {
         console.log("Error getting orders");
       }
@@ -66,7 +65,7 @@ function Profile() {
     getOrdersByUserFn();
   }, [currentUser?.userId]);
 
-  console.log("a-orderHistoryList", orderHistoryList?.ordersList);
+  // JSX
   return (
     <Box sx={{ maxWidth: 600, margin: "auto", mt: 4 }}>
       {/* Tabs */}

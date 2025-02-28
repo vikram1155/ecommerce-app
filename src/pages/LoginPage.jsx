@@ -141,15 +141,12 @@ function LoginPage({ setAuthenticated }) {
           //   dispatch(showSnackbar("Phone Number already registered!"));
           return;
         }
-        console.log("a--", {
-          ...formData,
-          favorites: [],
-        });
-        // const response = await createUserApi(formData);
-        // if (response.status.code === 201) {
-        //   authenticateUser(response.data);
-        //   //   dispatch(showSnackbar("Signed Up Successfully!"));
-        // }
+
+        const response = await createUserApi(formData);
+        if (response.status.code === 201) {
+          authenticateUser(response.data);
+          //   dispatch(showSnackbar("Signed Up Successfully!"));
+        }
       }
     } catch (error) {
       handleApiError(error);

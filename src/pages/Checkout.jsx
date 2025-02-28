@@ -45,7 +45,7 @@ function Checkout() {
         );
         setCartItems(allCartProducts?.data);
       } catch (error) {
-        console.log("Error feytching cart details");
+        console.log("Error fetching cart details");
       }
     };
     getProductsInCartByUserFn();
@@ -104,7 +104,6 @@ function Checkout() {
         userId: currentUser?.userId,
         ordersList: cartList,
       });
-      console.log("a-r", response);
 
       if (response.status.code === 200) {
         try {
@@ -114,7 +113,6 @@ function Checkout() {
             userEmail: currentUser?.email,
             productsInCart: [],
           });
-          console.log("a-removeCartItemsResponse", clearCartResponse);
           setButtonClick(true);
           setTimeout(() => {
             setOrderSuccessPage(true);

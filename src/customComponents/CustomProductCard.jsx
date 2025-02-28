@@ -15,7 +15,7 @@ function CustomProductCard({
 }) {
   const navigate = useNavigate();
   const location = useLocation();
-  console.log("a-favoritesListFromLocal", favoritesListFromLocal);
+
   //JSX
   return (
     <Box

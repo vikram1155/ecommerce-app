@@ -66,7 +66,6 @@ function CustomProductList({ list, filters, setFilters, setFilteredProducts }) {
         console.error("Failed to fetch favorites:", error);
       }
     };
-    console.log("a-f1", favoritesListFromLocal);
 
     fetchFavorites();
   }, []);
@@ -92,14 +91,12 @@ function CustomProductList({ list, filters, setFilters, setFilteredProducts }) {
           })
         );
       }
-      console.log("Updated favorites:", response);
     } catch (error) {
       console.error("Failed to update favorites:", error);
     }
   };
 
-  console.log("a-f", favoritesListFromLocal);
-
+  // JSX
   return (
     <Box>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, pb: 2 }}>
