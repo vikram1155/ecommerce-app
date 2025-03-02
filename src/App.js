@@ -29,7 +29,7 @@ function App() {
   );
   const adminAccess = JSON.parse(localStorage.getItem("userinfo"));
   const snackbar = useSelector((state) => state.snackbar);
-  
+
   // JSX
   return (
     <Box>
@@ -53,7 +53,7 @@ function App() {
               <Route
                 path="/"
                 element={
-                  <Layout>
+                  <Layout home={true}>
                     <Home />
                   </Layout>
                 }

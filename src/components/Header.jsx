@@ -19,6 +19,7 @@ import Dumbbells from "../assets/dumbbells.svg";
 import WheyProtein from "../assets/whey-protein.svg";
 import { useMediaQuery } from "@mui/material";
 import { ReactSVG as SVG } from "react-svg";
+import logo from "../assets/logo.svg";
 
 function Header() {
   const location = useLocation();
@@ -77,6 +78,7 @@ function Header() {
                 color: location.pathname.startsWith(routeTo)
                   ? theme.yellow
                   : theme.white,
+                textTransform: "uppercase",
                 "& .MuiTypography-body1": {
                   fontWeight: 600,
                 },
@@ -131,9 +133,10 @@ function Header() {
         sx={{
           cursor: "pointer",
           color: theme.yellow,
-          fontWeight: 600,
-          fontSize: location.pathname.startsWith(routeTo) ? "17px" : "16px",
+          fontWeight: 500,
+          fontSize: location.pathname.startsWith(routeTo) ? "14px" : "12px",
           textDecoration: location.pathname.startsWith(routeTo) && "underline",
+          textTransform: "uppercase",
           "&.MuiTypography-root:hover": {
             textDecoration: "underline",
             transform: "scale(1.1)",
@@ -176,12 +179,21 @@ function Header() {
             onClick={toggleDrawer(true)}
           />
         )}
-        <Typography
+        <Box onClick={() => navigate("/")} sx={{ cursor: "pointer" }}>
+          <img src={logo} alt="Logo" style={{ width: "24px" }} />
+        </Box>
+
+        {/* <Typography
           onClick={() => navigate("/")}
-          sx={{ cursor: "pointer", color: theme.yellow, fontWeight: 600 }}
+          sx={{
+            cursor: "pointer",
+            color: theme.yellow,
+            fontWeight: 600,
+            textTransform: "uppercase",
+          }}
         >
-          App name
-        </Typography>
+          Strength Hub
+        </Typography> */}
       </Box>
 
       {/* display these if screen size > 768px  */}

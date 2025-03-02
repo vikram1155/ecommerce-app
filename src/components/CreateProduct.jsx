@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { postProduct, updateProduct } from "../apiCalls/api";
 import { Box, IconButton } from "@mui/material";
 import { theme } from "../utils/theme";
@@ -14,8 +14,8 @@ const productFields = {
     { name: "weight", label: "Weight" },
     { name: "category", label: "Category" },
     { name: "price", label: "Price", type: "number" },
-    { name: "ratings", label: "Ratings", type: "number" },
-    { name: "no_of_ratings", label: "Number of Ratings", type: "number" },
+    // { name: "ratings", label: "Ratings", type: "number" },
+    // { name: "no_of_ratings", label: "Number of Ratings", type: "number" },
     { name: "description", label: "Description" },
     { name: "offer", label: "Offer (%)", type: "number" },
     { name: "features", label: "Features" },
@@ -42,6 +42,8 @@ const CreateProduct = ({
   handleCloseModal,
   type,
 }) => {
+  const [validations, setValidations] = useState("");
+
   useEffect(() => {
     if (productData.type === "Equipments") {
       setProductData((prev) => ({
@@ -66,18 +68,57 @@ const CreateProduct = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Compute finalProductData first
     const finalProductData = {
       ...productData,
+      ...(productData.type === "Protein-Foods" && {
+        ratings: 0,
+        no_of_ratings: 0,
+      }),
       ...(productData.type === "Equipments" && {
         protein: 0,
         carbs: 0,
         fat: 0,
         veg_nonveg: "null",
+        ratings: 0,
+        no_of_ratings: 0,
       }),
       ...(productData.type === "Supplements" && {
         veg_nonveg: "null",
+        ratings: 0,
+        no_of_ratings: 0,
       }),
     };
+
+    let errors = {};
+
+    // Validate after computing finalProductData
+    const allFields = [
+      ...productFields.common,
+      ...(productFields[finalProductData.type.toLowerCase().replace("-", "")] ||
+        []),
+    ];
+
+    allFields.forEach(({ name, type }) => {
+      const value = finalProductData[name];
+
+      if (!value && value !== 0) {
+        errors[name] = `${name.replace("_", " ")} is required`;
+      } else if (type === "string" && typeof value !== "string") {
+        errors[name] = `${name.replace("_", " ")} should be a string`;
+      } else if (type === "number" && (isNaN(value) || value === "")) {
+        errors[name] = `${name.replace("_", " ")} should be a number`;
+      }
+    });
+
+    // If there are errors, stop submission and update the state
+    if (Object.keys(errors).length > 0) {
+      setValidations(errors);
+      return;
+    }
+
+    setValidations({}); // Clear errors if validation passes
 
     try {
       const response =
@@ -94,6 +135,7 @@ const CreateProduct = ({
     }
   };
 
+  // JSX
   return (
     <Box
       component="form"
@@ -107,7 +149,7 @@ const CreateProduct = ({
         mt: 4,
         boxShadow: 3,
         borderRadius: 2,
-        bgcolor: theme.grey,
+        bgcolor: theme.black2,
         height: "525px",
         overflowY: "scroll",
         maxWidth: "400px",
@@ -127,22 +169,34 @@ const CreateProduct = ({
           </IconButton>
         </Box>
 
-        {productFields.common.map(({ name, label, type }) => (
-          <CustomTextField
-            key={name}
-            label={label}
-            name={name}
-            value={productData[name] || ""}
-            onChange={handleInputChange}
-            required
-          />
-        ))}
+        {productFields.common.map(({ name, label, type }) =>
+          name === "offer" ? (
+            <CustomSelect
+              label="Offer"
+              name="offer"
+              value={productData.offer}
+              onChange={handleInputChange}
+              options={[10, 20, 30, 40]}
+              required
+            />
+          ) : (
+            <CustomTextField
+              key={name}
+              label={label}
+              name={name}
+              value={productData[name] || ""}
+              onChange={handleInputChange}
+              required
+            />
+          )
+        )}
         <CustomSelect
           label="Type"
           name="type"
           value={productData.type}
           onChange={handleInputChange}
           options={typeOptions}
+          required
         />
 
         {productData.type === "Supplements" &&
@@ -158,16 +212,28 @@ const CreateProduct = ({
           ))}
 
         {productData.type === "Protein-Foods" &&
-          productFields.proteinFoods.map(({ name, label }) => (
-            <CustomTextField
-              key={name}
-              label={label}
-              name={name}
-              value={productData[name] || ""}
-              onChange={handleInputChange}
-              required
-            />
-          ))}
+          productFields.proteinFoods.map(({ name, label }) =>
+            name === "veg_nonveg" ? (
+              <CustomSelect
+                key={name}
+                label={label}
+                name={name}
+                value={productData.offer}
+                onChange={handleInputChange}
+                options={["Veg", "Non Veg"]}
+                required
+              />
+            ) : (
+              <CustomTextField
+                key={name}
+                label={label}
+                name={name}
+                value={productData[name] || ""}
+                onChange={handleInputChange}
+                required
+              />
+            )
+          )}
       </Box>
 
       <Box
@@ -179,6 +245,10 @@ const CreateProduct = ({
           padding: "12px 24px",
           left: "0",
           zIndex: 2,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 1,
         }}
       >
         <CustomButton
@@ -186,7 +256,17 @@ const CreateProduct = ({
           altText={type === "create" ? "Create Product" : "Update Product"}
           buttonText={type === "create" ? "Create Product" : "Update Product"}
           onClick={handleSubmit}
+          sx={{ justifySelf: "center" }}
         />
+        {Object.entries(validations).length ? (
+          <CustomTypography
+            value={`* ${Object.entries(validations)?.[0]?.[1]}`}
+            sx={{ fontSize: "10px", color: "red", textTransform: "capitalize" }}
+          />
+        ) : (
+          <></>
+        )}
+        {/* {Object.entries(validations)?.[0]?.[1]} */}
       </Box>
     </Box>
   );

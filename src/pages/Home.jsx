@@ -13,28 +13,26 @@ import WheyProtein from "../assets/whey-protein.svg";
 import { getAllProducts } from "../apiCalls/api";
 import { setProductsRedux } from "../redux/allProductsSlice";
 import { useDispatch } from "react-redux";
+import TodayDeals from "../customComponents/TodayDeals";
+import HeroSection from "../components/HeroSection";
+import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
+
 // Sample quotes
 const quotes = [
-  "No pain, no gain.",
-  "Sweat is just fat crying.",
-  "The body achieves what the mind believes.",
-  "Push yourself because no one else will do it for you.",
-  "Train insane or remain the same.",
-  "Strive for progress, not perfection.",
+  "The only bad workout is the one you didn't do. Be stronger than your excuses.",
+  "The pain you feel today will be the strength you feel tomorrow.",
+  "Action is the foundational key to all success. Excuses don’t burn calories.",
+  "No matter how slow you go, you're still lapping everyone on the couch.",
+  "To keep the body in good health is a duty. The body achieves what the mind believes.",
+  "It never gets easier, you just get better. Sweat is just fat crying.",
+  "Push yourself because no one else will do it for you. Train insane or remain the same.",
+  "Strive for progress, not perfection. Wake up. Work out. Look hot. Repeat.",
   "Fitness is not about being better than someone else; it's about being better than you used to be.",
-  "Don't limit your challenges, challenge your limits.",
-  "Stronger every day.",
-  "Hustle for that muscle.",
-  "Wake up. Work out. Look hot. Repeat.",
-  "Your only limit is you.",
-  "Sore today, strong tomorrow.",
-  "Be stronger than your excuses.",
-  "Sweat. Smile. Repeat.",
-  "You don't find willpower, you create it.",
-  "Make yourself proud.",
-  "The best project you'll ever work on is yourself.",
-  "Beast mode: ON.",
-  "Fall in love with taking care of yourself.",
+  "Don't limit your challenges, challenge your limits. Push and pull harder",
+  "Become stronger than yesterday everyday. Hustle for that muscle.",
+  "Be stronger than your excuses! Sweat. Smile. Repeat. Sore today, strong tomorrow.",
+  "You don't find willpower, you create it. Make yourself proud.",
+  "The best project you'll ever work on is yourself. Fall in love with taking care of yourself.",
 ];
 
 const Home = () => {
@@ -73,105 +71,32 @@ const Home = () => {
     getAllProductsFn();
   }, [dispatch]);
 
-  // const todaysDealProducts = [
-  //   {
-  //     name: "Dumbbells",
-  //     routeTo: "/equipments",
-  //     image: EquipmentsImage,
-  //     price: 1500,
-  //     offer: 15,
-  //   },
-  //   {
-  //     name: "Protein Powder",
-  //     routeTo: "/supplements",
-  //     image: SupplementsImage,
-  //     price: 2500,
-  //     offer: 20,
-  //   },
-  //   {
-  //     name: "Chicken Breast",
-  //     routeTo: "/protein-store",
-  //     image: ProteinFoodsImage,
-  //     price: 1200,
-  //     offer: 10,
-  //   },
-  //   {
-  //     name: "Kettlebells",
-  //     routeTo: "/equipments",
-  //     image: EquipmentsImage,
-  //     price: 1800,
-  //     offer: 12,
-  //   },
-  //   {
-  //     name: "Creatine",
-  //     routeTo: "/supplements",
-  //     image: SupplementsImage,
-  //     price: 2200,
-  //     offer: 18,
-  //   },
-  //   {
-  //     name: "Salmon Fillet",
-  //     routeTo: "/protein-store",
-  //     image: ProteinFoodsImage,
-  //     price: 2000,
-  //     offer: 8,
-  //   },
-  //   {
-  //     name: "Treadmill",
-  //     routeTo: "/equipments",
-  //     image: EquipmentsImage,
-  //     price: 15000,
-  //     offer: 25,
-  //   },
-  //   {
-  //     name: "BCAA",
-  //     routeTo: "/supplements",
-  //     image: SupplementsImage,
-  //     price: 1800,
-  //     offer: 14,
-  //   },
-  //   {
-  //     name: "Egg Whites",
-  //     routeTo: "/protein-store",
-  //     image: ProteinFoodsImage,
-  //     price: 800,
-  //     offer: 5,
-  //   },
-  //   {
-  //     name: "Resistance Bands",
-  //     routeTo: "/equipments",
-  //     image: EquipmentsImage,
-  //     price: 900,
-  //     offer: 10,
-  //   },
-  // ];
-
   const navigate = useNavigate();
+  const handleShopNowButtonClick = () => {
+    const section3 = document.getElementById("section3");
+    if (section3) {
+      section3.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
+  // JSX
   return (
     <Box>
       {/* Section 1: Hero Banner */}
-      <Box
-        sx={{
-          height: "300px",
-          backgroundImage: "url(https://via.placeholder.com/1200x300)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          color: "white",
-          textAlign: "center",
-          p: 4,
-        }}
-      >
-        <Typography variant="h4" sx={{ mb: 2 }}>
-          "Work Hard, Train Harder - For the Future You!"
-        </Typography>
-      </Box>
+      <HeroSection onClick={handleShopNowButtonClick} />
 
       {/* Section 2: Categories */}
+      <Box id="section3"> </Box>
+      <br></br>
+      <CustomTypography
+        heading={true}
+        value="Categories"
+        sx={{
+          fontWeight: 600,
+          textAlign: "center",
+          my: 5,
+        }}
+      />
       <Box
         sx={{
           display: "flex",
@@ -264,131 +189,27 @@ const Home = () => {
         ))}
       </Box>
 
-      {/* Section 3: Today's Deals */}
-      <Box sx={{ p: 4 }}>
-        <CustomTypography
-          heading={true}
-          value="Today's Deals"
-          sx={{ fontSize: "24px", fontWeight: 600, textAlign: "center", my: 5 }}
-        />
-        <Box
-          sx={{
-            display: "flex",
-            gap: 3,
-            alignItems: "center",
-            justifyContent: "center",
-            flexWrap: "wrap",
-            flexDirection: { xs: "column", sm: "row" },
-            maxWidth: "100%",
-          }}
+      <TodayDeals todaysDealProducts={todaysDealProducts} />
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "80px 0 120px",
+          margin: "auto",
+          width: "70%",
+        }}
+      >
+        <FormatQuoteIcon sx={{ fontSize: 80 }} />
+        <Typography
+          variant={"h6"}
+          fontWeight={700}
+          gutterBottom
+          sx={{ fontStyle: "italic" }}
         >
-          {todaysDealProducts
-            ?.filter((todaysDealProduct) => todaysDealProduct.offer >= 20)
-            .map((todaysDealProduct) => (
-              <Box
-                sx={{ textAlign: "center", p: 2 }}
-                onClick={() => {
-                  navigate(
-                    `${
-                      todaysDealProduct.type === "Equipments"
-                        ? "/equipments"
-                        : todaysDealProduct.type === "Supplements"
-                        ? "/supplements"
-                        : "/protein-store"
-                    }/${todaysDealProduct.productId}`
-                  );
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: 1,
-                    background: theme.black2,
-                    p: 2,
-                    borderRadius: 2,
-                    cursor: "pointer",
-                    maxWidth: "250px",
-                    m: "auto",
-                    "&:hover": {
-                      transform: "scale(1.1)",
-                      transition: "transform 300ms",
-                    },
-                  }}
-                  onClick={() => navigate(todaysDealProduct.routeTo)}
-                >
-                  <Box
-                    sx={{
-                      height: { xs: "250px", sm: "200px" },
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <img
-                      src={
-                        todaysDealProduct.type === "Equipments"
-                          ? EquipmentsImage
-                          : todaysDealProduct.type === "Supplements"
-                          ? SupplementsImage
-                          : ProteinFoodsImage
-                      }
-                      alt={todaysDealProduct.name}
-                      style={{
-                        maxHeight: "100%",
-                        maxWidth: "100%",
-                        objectFit: "contain",
-                      }}
-                    />
-                  </Box>
-                  <Typography variant="body1">
-                    {todaysDealProduct.name}
-                  </Typography>
-                  <Box
-                    display={"flex"}
-                    alignItems={"center"}
-                    justifyContent={"center"}
-                    gap={1}
-                  >
-                    <CustomTypography
-                      heading={false}
-                      value={todaysDealProduct.price}
-                      sx={{
-                        fontWeight: 400,
-                        fontSize: "14px",
-                        textDecoration: "line-through",
-                        color: "grey !important",
-                      }}
-                    />
-                    <CustomTypography
-                      heading={false}
-                      value={`₹${
-                        todaysDealProduct.price -
-                        (todaysDealProduct.price * todaysDealProduct.offer) /
-                          100
-                      }`}
-                      sx={{ fontWeight: 400, fontSize: "18px" }}
-                    />
-                    <CustomTypography
-                      heading={false}
-                      value={`${todaysDealProduct.offer}% Off`}
-                      sx={{
-                        fontWeight: 400,
-                        fontSize: "14px",
-                        color: `${theme.yellow} !important`,
-                      }}
-                    />
-                  </Box>
-                </Box>
-              </Box>
-            ))}
-        </Box>
-      </Box>
-
-      {/* Section 4: Quotes */}
-      <Box sx={{ p: 4, textAlign: "center" }}>
-        <Typography variant="h6">{randomQuote}</Typography>
+          {randomQuote}
+        </Typography>
       </Box>
     </Box>
   );

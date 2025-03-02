@@ -9,49 +9,29 @@ import {
   List,
   ListItem,
   Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Rating,
 } from "@mui/material";
 import { theme } from "../utils/theme";
-import { getOrdersByUser } from "../apiCalls/api";
-
-const orderHistory = [
-  {
-    id: 1,
-    productName: "Whey Protein",
-    quantity: 2,
-    price: 2000,
-    orderedOn: "2024-02-10",
-    status: "Completed",
-  },
-  {
-    id: 2,
-    productName: "Creatine Monohydrate",
-    quantity: 1,
-    price: 1500,
-    orderedOn: "2024-02-08",
-    status: "In Progress",
-  },
-  {
-    id: 3,
-    productName: "Multivitamins",
-    quantity: 3,
-    price: 900,
-    orderedOn: "2024-02-05",
-    status: "Completed",
-  },
-  {
-    id: 4,
-    productName: "BCAA",
-    quantity: 1,
-    price: 1200,
-    orderedOn: "2024-02-03",
-    status: "Completed",
-  },
-];
+import {
+  getAllProducts,
+  getOrdersByUser,
+  updateOrderByUser,
+  updateProduct,
+} from "../apiCalls/api";
+import CustomButton from "../customComponents/CustomButton";
 
 function Profile() {
   const [activeTab, setActiveTab] = useState(0);
   const currentUser = JSON.parse(localStorage.getItem("userinfo"));
   const [orderHistoryList, setOrderHistoryList] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
+  const [openRatingDialog, setOpenRatingDialog] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [ratingValue, setRatingValue] = useState(0);
 
   useEffect(() => {
     const getOrdersByUserFn = async () => {
@@ -65,19 +45,87 @@ function Profile() {
     getOrdersByUserFn();
   }, [currentUser?.userId]);
 
+  useEffect(() => {
+    const getAllProductsFn = async () => {
+      try {
+        const response = await getAllProducts();
+        if (response?.data) {
+          setAllProducts(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+    getAllProductsFn();
+  }, []);
+
+  const handleOpenRatingDialog = (productId) => {
+    const product = allProducts.find((p) => p.productId === productId);
+    if (product) {
+      setSelectedProduct(product);
+      setOpenRatingDialog(true);
+    }
+  };
+
+  const handleSubmitRating = async () => {
+    if (!selectedProduct || ratingValue === 0) return;
+
+    const updatedRatings =
+      (selectedProduct.ratings * selectedProduct.no_of_ratings + ratingValue) /
+      (selectedProduct.no_of_ratings + 1);
+
+    const updatedData = {
+      ratings: parseFloat(updatedRatings.toFixed(1)),
+      no_of_ratings: selectedProduct.no_of_ratings + 1,
+    };
+
+    try {
+      await updateProduct(selectedProduct.productId, updatedData);
+      setAllProducts((prevProducts) =>
+        prevProducts.map((p) =>
+          p.productId === selectedProduct.productId
+            ? { ...p, ...updatedData }
+            : p
+        )
+      );
+
+      // Update order status to "Reviewed"
+      const orderToUpdate = orderHistoryList?.ordersList?.find(
+        (order) => order.productId === selectedProduct.productId
+      );
+
+      if (orderToUpdate) {
+        await updateOrderByUser(currentUser?.userId, orderToUpdate.orderId, {
+          ...orderToUpdate,
+          status: "Reviewed",
+        });
+
+        setOrderHistoryList((prevOrders) => ({
+          ...prevOrders,
+          ordersList: prevOrders.ordersList.map((order) =>
+            order.orderId === orderToUpdate.orderId
+              ? { ...order, status: "Reviewed" }
+              : order
+          ),
+        }));
+      }
+
+      setOpenRatingDialog(false);
+    } catch (error) {
+      console.error("Failed to update product rating", error);
+    }
+  };
+
   // JSX
   return (
-    <Box sx={{ maxWidth: 600, margin: "auto", mt: 4 }}>
-      {/* Tabs */}
+    <Box sx={{ maxWidth: 600, margin: "auto", mt: 2 }}>
       <Tabs
         value={activeTab}
         onChange={(event, newValue) => setActiveTab(newValue)}
         centered
         sx={{
           mb: 2,
-          "& .MuiTabs-indicator": {
-            backgroundColor: theme.yellow,
-          },
+          "& .MuiTabs-indicator": { backgroundColor: theme.yellow },
           "& .MuiTabs-flexContainer": {
             gap: { xs: 3, sm: 8 },
           },
@@ -111,7 +159,10 @@ function Profile() {
         <Card sx={{ boxShadow: 3, backgroundColor: theme.grey }}>
           <CardContent sx={{ textAlign: "center", p: 0 }}>
             {Object.entries(currentUser)
-              .filter(([key]) => key !== "userId" && key !== "admin")
+              .filter(
+                ([key]) =>
+                  key !== "userId" && key !== "admin" && key !== "favorites"
+              )
               .map(([key, value]) => (
                 <Box
                   sx={{
@@ -149,63 +200,102 @@ function Profile() {
         <Box sx={{ boxShadow: 2, borderRadius: 2, background: theme.grey }}>
           <List>
             {orderHistoryList?.ordersList?.length ? (
-              orderHistoryList?.ordersList?.map((order, index) => (
-                <React.Fragment key={order.id}>
-                  <ListItem
-                    sx={{
-                      p: 3,
-                      pb: 3.5,
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Box>
-                      <Typography
-                        variant="subtitle1"
-                        sx={{ color: theme.white }}
-                      >
-                        <strong>{order.productName}</strong> (x{order.quantity})
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="textSecondary"
-                        sx={{ color: theme.white }}
-                      >
-                        ₹{order.costWhenOrdered} | Ordered on:{" "}
-                        {new Date(order.orderedOnDate).toLocaleDateString(
-                          "en-GB",
-                          {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          }
+              orderHistoryList.ordersList
+                .sort(
+                  (a, b) =>
+                    new Date(b.orderedOnDate) - new Date(a.orderedOnDate)
+                )
+                .map((order, index) => (
+                  <React.Fragment key={order.id}>
+                    <ListItem
+                      sx={{
+                        p: 3,
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Box>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ color: theme.white }}
+                        >
+                          <strong>{order.productName}</strong> (x
+                          {order.quantity})
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: theme.white }}>
+                          ₹{order.costWhenOrdered} | Ordered on:{" "}
+                          {new Date(order.orderedOnDate).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}
+                        </Typography>
+                        {order.status === "Completed" && (
+                          <CustomButton
+                            buttonText="Rate Product"
+                            onClick={() =>
+                              handleOpenRatingDialog(order.productId)
+                            }
+                            sx={{ mt: 2 }}
+                          />
                         )}
-                      </Typography>
-                    </Box>
-                    <Box>
-                      <span
-                        style={{
-                          color:
-                            order.status === "Completed" ? "green" : "orange",
-                        }}
-                      >
-                        {order.status}
-                      </span>
-                    </Box>
-                  </ListItem>
-                  {index < orderHistoryList?.ordersList?.length - 1 && (
-                    <Divider sx={{ bgcolor: theme.white }} />
-                  )}
-                </React.Fragment>
-              ))
+                      </Box>
+                      <Box>
+                        <span
+                          style={{
+                            color:
+                              order.status === "Completed" ? "green" : "orange",
+                          }}
+                        >
+                          <CustomButton
+                            buttonText={`${order.status} ${
+                              order.status === "Completed"
+                                ? "✅"
+                                : order.status === "In Progress"
+                                ? "🔜"
+                                : "⭐"
+                            }`}
+                            sx={{ mt: 2, width: "135px" }}
+                            disabled
+                          />
+                        </span>
+                      </Box>
+                    </ListItem>
+                    {index < orderHistoryList?.ordersList?.length - 1 && (
+                      <Divider sx={{ bgcolor: theme.white }} />
+                    )}
+                  </React.Fragment>
+                ))
             ) : (
               <>No Orders</>
             )}
           </List>
         </Box>
       )}
+
+      <Dialog
+        open={openRatingDialog}
+        onClose={() => setOpenRatingDialog(false)}
+      >
+        <DialogTitle>Rate {selectedProduct?.name}</DialogTitle>
+        <DialogContent>
+          <Rating
+            name="product-rating"
+            value={ratingValue}
+            onChange={(event, newValue) => setRatingValue(newValue)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <CustomButton buttonText="Submit" onClick={handleSubmitRating} />
+          <CustomButton
+            buttonText="Cancel"
+            onClick={() => setOpenRatingDialog(false)}
+          />
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

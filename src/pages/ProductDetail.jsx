@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Typography, IconButton, Chip } from "@mui/material";
+import {
+  Box,
+  Typography,
+  IconButton,
+  Chip,
+  useMediaQuery,
+} from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
@@ -17,6 +23,8 @@ import AddIcon from "@mui/icons-material/Add";
 import { theme } from "../utils/theme";
 import { addOrUpdateOrder } from "../redux/orderListSlice";
 import { showSnackbar } from "../redux/snackbarSlice";
+import TodayDeals from "../customComponents/TodayDeals";
+import CustomTypography from "../customComponents/CustomTypography";
 
 const COLORS = ["#FF0000", "#00C49F", "#FFBB28"]; // Red for Protein, Green for Carbs, Yellow for Fat
 
@@ -25,6 +33,10 @@ function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [quantity, setQuantity] = useState(1);
+  const isMobile = useMediaQuery("(max-width: 550px)");
+  const isTab = useMediaQuery("(max-width: 1024px)");
+  // Deals
+  const [todaysDealProducts, setTodaysDealProducts] = useState();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -37,6 +49,7 @@ function ProductDetail() {
         const response = await getAllProducts();
         if (response?.data) {
           setProduct(response?.data.find((item) => item.productId === id));
+          setTodaysDealProducts(response.data);
         }
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -79,7 +92,6 @@ function ProductDetail() {
           })
         );
       }
-      console.log("Updated favorites:", response);
     } catch (error) {
       console.error("Failed to update favorites:", error);
     }
@@ -130,145 +142,264 @@ function ProductDetail() {
   }
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        gap: "5%",
-        maxWidth: "900px",
-        margin: "auto",
-        mt: 4,
-      }}
-    >
-      {/* Left Section - Image */}
+    <Box>
       <Box
         sx={{
-          width: "45%",
-          height: "400px",
-          background: "#f3f3f3",
-          borderRadius: "10px",
+          display: "flex",
+          maxWidth: "900px",
+          margin: "auto",
+          mt: 4,
+          flexDirection: isMobile ? "column" : "row",
+          gap: isMobile ? 4 : "5%",
         }}
       >
-        <img
-          src={product.image}
-          alt={product.name}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            borderRadius: "10px",
-          }}
-        />
-      </Box>
-
-      {/* Right Section - Details */}
-      <Box
-        sx={{ width: "50%", display: "flex", flexDirection: "column", gap: 2 }}
-      >
-        {/* Favorite Icon */}
-        <Box sx={{ alignSelf: "flex-end" }}>
-          <IconButton
-            onClick={() => handleFavoriteButtonClick(product?.productId)}
-            color="error"
-          >
-            {favoritesListFromLocal.includes(product.productId) ? (
-              <FavoriteIcon />
-            ) : (
-              <FavoriteBorderIcon />
-            )}
-          </IconButton>
-        </Box>
-
-        {/* Product Name & Price */}
-        <Typography variant="h5" fontWeight="bold">
-          {product.name}
-        </Typography>
-        <Typography variant="h6">
-          ₹{product.price}{" "}
-          <span style={{ fontSize: "16px", color: "gray" }}>
-            ({product.offer})
-          </span>
-        </Typography>
-
-        {/* Category Tag */}
-        <Chip
-          label={product.category}
-          sx={{ backgroundColor: "#FFD700", color: "#000", fontWeight: "bold" }}
-        />
-
-        {/* Ratings & Purchases */}
-        <Typography variant="body1">
-          {product.ratings} ⭐ ({product.no_of_ratings} purchases)
-        </Typography>
-
-        {/* Quantity Selector */}
+        {/* Left Section - Image */}
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 2,
-            border: "1px solid gray",
-            borderRadius: "5px",
-            width: "fit-content",
-            padding: "5px",
+            width: isMobile ? "100%" : "40%",
+            height: "400px",
+            background: "#f3f3f3",
+            borderRadius: "10px",
           }}
         >
-          <IconButton
-            size="small"
-            onClick={() => quantity > 0 && handleQuantityChange("decrease")}
-          >
-            <RemoveIcon
-              fontSize="small"
-              sx={{ color: quantity > 1 ? theme.white : "#333" }}
-            />
-          </IconButton>
-          <Typography>{quantity}</Typography>
-          <IconButton
-            size="small"
-            onClick={() => quantity < 6 && handleQuantityChange("increase")}
-          >
-            <AddIcon
-              fontSize="small"
-              sx={{ color: quantity < 6 ? theme.white : "#333" }}
-            />
-          </IconButton>
+          <img
+            src={product.image}
+            alt={product.name}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              borderRadius: "10px",
+            }}
+          />
         </Box>
 
-        {/* Add to Cart Button */}
-        <CustomButton
-          variant="contained"
-          iconSrc={<ShoppingCartIcon sx={{ fontSize: "16px" }} />}
-          altText={"Shopping Cart"}
-          buttonText={product.inCart ? "Go To Cart" : "Add To Cart"}
-          onClick={handleAddToCart}
-        />
+        {/* Right Section - Details */}
 
-        {/* Description */}
-        <Typography variant="body2" color="gray">
-          {product.description}
-        </Typography>
-
-        {/* Pie Chart for Nutrition */}
-        <ResponsiveContainer width="100%" height={200}>
-          <PieChart>
-            <Pie
-              data={nutritionData}
-              cx="50%"
-              cy="50%"
-              outerRadius={60}
-              fill="#8884d8"
-              dataKey="value"
+        <Box
+          sx={{
+            width: isMobile ? "100%" : "50%",
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            justifyContent: "space-between",
+          }}
+        >
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: !isTab ? "1fr 1fr" : "auto",
+              alignItems: "center",
+              position: "relative",
+            }}
+          >
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+              }}
             >
-              {nutritionData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
+              {/* Favorite Icon */}
+              <Box
+                sx={{
+                  alignSelf: "flex-end",
+                  position: "absolute",
+                  right: 0,
+                  top: "-10px",
+                }}
+              >
+                <IconButton
+                  onClick={() => handleFavoriteButtonClick(product?.productId)}
+                  color="error"
+                >
+                  {favoritesListFromLocal.includes(product.productId) ? (
+                    <FavoriteIcon />
+                  ) : (
+                    <FavoriteBorderIcon />
+                  )}
+                </IconButton>
+              </Box>
+              {/* Product Name & Price */}
+              <Typography variant="h5" fontWeight="bold">
+                {product.name} | {product.description}
+              </Typography>
+              <Chip
+                label={product.category}
+                sx={{
+                  backgroundColor: theme.yellow,
+                  color: "#000",
+                  fontWeight: "bold",
+                  width: "fit-content",
+                }}
+              />
+              <Box display={"flex"} gap={1} alignItems={"center"}>
+                <CustomTypography
+                  heading={false}
+                  value={`${
+                    product.price + (product.price * product.offer) / 100
+                  }`}
+                  sx={{
+                    fontWeight: 400,
+                    fontSize: "14px",
+                    textDecoration: "line-through",
+                    color: "grey !important",
+                  }}
                 />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
+                <CustomTypography
+                  heading={false}
+                  value={`₹${product.price}`}
+                  sx={{ fontWeight: 400, fontSize: "18px" }}
+                />
+                <CustomTypography
+                  heading={false}
+                  value={`${product.offer}% Off`}
+                  sx={{
+                    fontWeight: 400,
+                    fontSize: "14px",
+                    color: `${theme.yellow} !important`,
+                  }}
+                />
+              </Box>
+              {/* Category Tag */}
+
+              <Typography variant="body1">{product.features}</Typography>
+              {/* Ratings & Purchases */}
+              {product.no_of_ratings ? (
+                <Typography variant="body1">
+                  {product.no_of_ratings} happy customers!
+                </Typography>
+              ) : (
+                <></>
+              )}
+            </Box>
+            {/* Pie Chart for Nutrition */}
+
+            {product?.protein || product?.carbs || product?.fat ? (
+              <Box
+                sx={{
+                  display: isTab && "flex",
+                  alignItems: isTab && "center",
+                  gap: isTab && 3,
+                }}
+              >
+                <ResponsiveContainer
+                  width={150}
+                  height={150}
+                  style={{ padding: "20px 0" }}
+                >
+                  <PieChart>
+                    <Pie
+                      data={nutritionData}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={60}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {nutritionData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    flexDirection: isTab && "column",
+                  }}
+                >
+                  <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                    <Box
+                      sx={{
+                        height: "16px",
+                        width: "16px",
+                        bgcolor: "#FF0000",
+                        borderRadius: 1,
+                      }}
+                    ></Box>
+                    Protein
+                  </Box>
+                  <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                    <Box
+                      sx={{
+                        height: "16px",
+                        width: "16px",
+                        bgcolor: "#00C49F",
+                        borderRadius: 1,
+                      }}
+                    ></Box>
+                    Carbs
+                  </Box>
+                  <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                    <Box
+                      sx={{
+                        height: "16px",
+                        width: "16px",
+                        bgcolor: "#FFBB28",
+                        borderRadius: 1,
+                      }}
+                    ></Box>
+                    Fat
+                  </Box>
+                </Box>
+              </Box>
+            ) : (
+              <></>
+            )}
+          </Box>
+          <Box>
+            {/* Quantity Selector */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                border: "1px solid gray",
+                borderRadius: "5px",
+                width: "fit-content",
+                padding: "5px",
+              }}
+            >
+              <IconButton
+                size="small"
+                onClick={() => quantity > 0 && handleQuantityChange("decrease")}
+              >
+                <RemoveIcon
+                  fontSize="small"
+                  sx={{ color: quantity > 1 ? theme.white : "#333" }}
+                />
+              </IconButton>
+              <Typography>{quantity}</Typography>
+              <IconButton
+                size="small"
+                onClick={() => quantity < 6 && handleQuantityChange("increase")}
+              >
+                <AddIcon
+                  fontSize="small"
+                  sx={{ color: quantity < 6 ? theme.white : "#333" }}
+                />
+              </IconButton>
+            </Box>
+            {/* Add to Cart Button */}
+            <CustomButton
+              variant="contained"
+              iconSrc={<ShoppingCartIcon sx={{ fontSize: "16px" }} />}
+              altText={"Shopping Cart"}
+              buttonText={product.inCart ? "Go To Cart" : "Add To Cart"}
+              onClick={handleAddToCart}
+              sx={{ mt: 2, width: "100%" }}
+            />
+          </Box>
+        </Box>
       </Box>
+      <TodayDeals todaysDealProducts={todaysDealProducts} />
     </Box>
   );
 }

@@ -83,22 +83,21 @@ export const loginUserFromApi = async (data) => {
 // Order APIs
 export const getAllOrders = async () => {
   try {
-    const response = await api.get(API_ENDPOINTS.ORDERS);
+    const response = await api.get(API_ENDPOINTS.ORDERS); // Fetches all orders
     return response.data;
   } catch (error) {
-    throw new Error("Failed to fetch order");
+    throw new Error("Failed to fetch all orders");
   }
 };
 
 export const getOrdersByUser = async (userId) => {
   try {
-    const params = new URLSearchParams();
-    if (userId) params.append("userId", userId);
-    // if (userEmail) params.append("userEmail", userEmail);
+    if (!userId) throw new Error("User ID is required");
 
-    const response = await api.get(
-      `${API_ENDPOINTS.ORDERS}?${params.toString()}`
-    );
+    const response = await api.get(`${API_ENDPOINTS.ORDERS}/user`, {
+      params: { userId }, // Updated endpoint to match /orders/user
+    });
+
     return response.data;
   } catch (error) {
     throw new Error("Failed to fetch user orders");
@@ -112,6 +111,19 @@ export const postOrdersByUser = async (data) => {
   } catch (error) {
     console.error("Error posting cart data:", error);
     throw new Error("Failed to update cart");
+  }
+};
+
+export const updateOrderByUser = async (userId, orderId, updatedData) => {
+  try {
+    const response = await api.put(
+      `${API_ENDPOINTS.ORDERS}/${userId}/${orderId}`,
+      updatedData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating order:", error);
+    throw new Error("Failed to update order");
   }
 };
 

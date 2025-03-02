@@ -4,15 +4,17 @@ import CustomProductCard from "./CustomProductCard";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { theme } from "../utils/theme";
 import CustomTypography from "./CustomTypography";
-import { getFavorites, updateFavorites } from "../apiCalls/api";
+import { getAllProducts, getFavorites, updateFavorites } from "../apiCalls/api";
 import { useDispatch } from "react-redux";
 import { showSnackbar } from "../redux/snackbarSlice";
+import TodayDeals from "./TodayDeals";
 
 const FilterChip = ({ label, onRemove }) => (
   <Box
     sx={{
       border: `1px solid ${theme.yellow}`,
-      p: 1,
+      py: 0.8,
+      px: 1.5,
       display: "flex",
       alignItems: "center",
       gap: 1,
@@ -22,7 +24,7 @@ const FilterChip = ({ label, onRemove }) => (
     }}
   >
     <CustomTypography
-      heading={true}
+      heading={false}
       value={label}
       sx={{ fontWeight: 400, fontSize: "14px", color: theme.yellow }}
     />

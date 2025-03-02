@@ -4,7 +4,15 @@ import { theme } from "../utils/theme";
 
 function CustomTypography({ value, heading, sx }) {
   return (
-    <Typography sx={{ color: heading ? theme.yellow : theme.white, ...sx }}>
+    <Typography
+      sx={{
+        color: heading ? theme.yellow : theme.white,
+        textTransform: heading && "uppercase",
+        fontSize: heading && "16px",
+        fontWeight: heading ? 600 : 400,
+        ...sx,
+      }}
+    >
       {value}
     </Typography>
   );

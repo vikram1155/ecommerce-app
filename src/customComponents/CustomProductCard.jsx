@@ -58,7 +58,7 @@ function CustomProductCard({
       {/* Product Image */}
       <Box
         sx={{
-          height: "150px",
+          height: "120px",
           display: "flex",
           justifyContent: "center",
           mb: 1,
@@ -116,12 +116,15 @@ function CustomProductCard({
             }}
           />
         </Box>
-
-        <CustomTypography
-          heading={false}
-          value={`⭐ ${item.ratings} (${item.no_of_ratings})`}
-          sx={{ fontWeight: 400, fontSize: "12px" }}
-        />
+        {item.ratings ? (
+          <CustomTypography
+            heading={false}
+            value={`⭐ ${item.ratings} (${item.no_of_ratings})`}
+            sx={{ fontWeight: 400, fontSize: "12px" }}
+          />
+        ) : (
+          <></>
+        )}
         <br></br>
         {/* Add to Cart Button */}
         <CustomButton

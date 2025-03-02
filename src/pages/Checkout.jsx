@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import CustomTypography from "../customComponents/CustomTypography";
 import { theme } from "../utils/theme";
 import CustomButton from "../customComponents/CustomButton";
@@ -23,6 +28,7 @@ function Checkout() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const currentUser = JSON.parse(localStorage.getItem("userinfo"));
+  const isMobile = useMediaQuery("(max-width: 550px)");
 
   // Utils
   const totalPrice = productsInCart.reduce(
@@ -145,6 +151,16 @@ function Checkout() {
   // JSX
   return (
     <Box>
+      <CustomTypography
+        heading
+        value="Checkout"
+        sx={{
+          textAlign: "center",
+          fontWeight: 600,
+          padding: "30px 0 50px",
+          fontSize: 18,
+        }}
+      />
       {buttonClick ? (
         orderSuccessPage ? (
           <Box
@@ -187,21 +203,14 @@ function Checkout() {
       ) : (
         <Box
           sx={{
-            p: 3,
+            padding: "10px 40px 35px",
             maxWidth: 600,
             mx: "auto",
             background: theme.grey,
             borderRadius: 2,
             boxShadow: 3,
-            mt: 3,
           }}
         >
-          <Typography
-            variant="h5"
-            sx={{ mb: 2, fontWeight: "bold", textAlign: "center" }}
-          >
-            Checkout
-          </Typography>
           {productsInCart?.length > 0 ? (
             <>
               {productsInCart?.map((item) => (
@@ -210,15 +219,20 @@ function Checkout() {
                   gap={1}
                   alignItems={"center"}
                   justifyContent={"space-between"}
-                  pt={3}
+                  py={3}
                 >
                   <Box display={"flex"} gap={1} flexDirection={"column"}>
-                    <Box display={"flex"} gap={1} alignItems={"center"}>
-                      <CustomTypography
-                        heading={true}
-                        value={item.name}
-                        sx={{ fontWeight: 400, fontSize: "18px" }}
-                      />
+                    <CustomTypography
+                      heading={true}
+                      value={item.name}
+                      sx={{ fontWeight: 400, fontSize: "18px" }}
+                    />
+                    <Box
+                      display={"flex"}
+                      gap={1}
+                      alignItems={isMobile ? "flex-start" : "center"}
+                      flexDirection={isMobile ? "column" : "row"}
+                    >
                       <CustomTypography
                         heading={true}
                         value={`(${item.category})`}
@@ -240,6 +254,7 @@ function Checkout() {
                       altText={"Remove Item"}
                       buttonText={"Remove Item"}
                       onClick={() => handleRemoveItem(item.productId)}
+                      sx={{ width: "fit-content", mt: 1 }}
                     />
                   </Box>
 

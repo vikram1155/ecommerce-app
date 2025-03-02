@@ -92,14 +92,20 @@ function Wishlist() {
       <CustomTypography
         heading
         value="Wishlist"
-        sx={{ textAlign: "center", fontSize: "16px", fontWeight: 600, py: 2 }}
+        sx={{
+          textAlign: "center",
+          fontWeight: 600,
+          padding: "30px 0 50px",
+          fontSize: 18,
+        }}
       />
 
       {wishList.length > 0 ? (
         <Box
           sx={{
             display: "grid",
-            gap: 2,
+            gap: 4,
+            pb: 2,
             gridTemplateColumns: {
               xs: "repeat(2, 1fr)",
               md: "repeat(3, 1fr)",

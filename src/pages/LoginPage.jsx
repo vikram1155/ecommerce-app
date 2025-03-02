@@ -13,6 +13,7 @@ import {
   getAllUsersFromApi,
   loginUserFromApi,
 } from "../apiCalls/api";
+import { showSnackbar } from "../redux/snackbarSlice";
 
 function LoginPage({ setAuthenticated }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -21,7 +22,7 @@ function LoginPage({ setAuthenticated }) {
   const [formData, setFormData] = useState({
     name: "",
     age: null,
-    admin: true,
+    admin: false,
     password: "",
     email: "",
     phone: "",
@@ -124,7 +125,7 @@ function LoginPage({ setAuthenticated }) {
         });
         if (response.status.code === 200) {
           authenticateUser(response.data.userDetails);
-          //   dispatch(showSnackbar("Logged In Successfully!"));
+          dispatch(showSnackbar("Logged In Successfully!"));
         }
       } else if (!isLogin && formErrors?.length === 0) {
         const emailExists = allUsersFromAPI.some(
@@ -134,18 +135,18 @@ function LoginPage({ setAuthenticated }) {
           (member) => member.phone === formData.phone
         );
         if (emailExists) {
-          //   dispatch(showSnackbar("Email already registered!"));
+          dispatch(showSnackbar("Email already registered!"));
           return;
         }
         if (phoneExists) {
-          //   dispatch(showSnackbar("Phone Number already registered!"));
+          dispatch(showSnackbar("Phone Number already registered!"));
           return;
         }
 
         const response = await createUserApi(formData);
         if (response.status.code === 201) {
           authenticateUser(response.data);
-          //   dispatch(showSnackbar("Signed Up Successfully!"));
+          dispatch(showSnackbar("Signed Up Successfully!"));
         }
       }
     } catch (error) {
