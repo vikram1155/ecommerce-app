@@ -33,13 +33,13 @@ function Footer() {
       >
         <CustomTypography heading={true} value={"Connect for more!"} />
         <LinkedInIcon
-          sx={{ fontSize: 18, cursor: "pointer", color: theme.yellow }}
+          sx={{ fontSize: "16px", cursor: "pointer", color: theme.yellow }}
           onClick={() =>
             window.open("https://www.linkedin.com/in/vikram1155/", "_blank")
           }
         />
         <GitHubIcon
-          sx={{ fontSize: 18, cursor: "pointer", color: theme.yellow }}
+          sx={{ fontSize: "16px", cursor: "pointer", color: theme.yellow }}
           onClick={() =>
             window.open("https://github.com/vikram1155/", "_blank")
           }

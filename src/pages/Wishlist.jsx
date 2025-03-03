@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import CustomProductCard from "../customComponents/CustomProductCard";
 import CustomTypography from "../customComponents/CustomTypography";
 import { getAllProducts, getFavorites, updateFavorites } from "../apiCalls/api";
 import { useDispatch } from "react-redux";
 import { showSnackbar } from "../redux/snackbarSlice";
+import { theme } from "../utils/theme";
 
 function Wishlist() {
   const currentUser = JSON.parse(localStorage.getItem("userinfo"));
@@ -96,7 +97,7 @@ function Wishlist() {
           textAlign: "center",
           fontWeight: 600,
           padding: "30px 0 50px",
-          fontSize: 18,
+          fontSize: "14px",
         }}
       />
 
@@ -107,10 +108,11 @@ function Wishlist() {
             gap: 4,
             pb: 2,
             gridTemplateColumns: {
-              xs: "repeat(2, 1fr)",
-              md: "repeat(3, 1fr)",
-              lg: "repeat(4, 1fr)",
-              xl: "repeat(5, 1fr)",
+              xs: "repeat(1, 1fr)",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(4, 1fr)",
+              lg: "repeat(5, 1fr)",
+              xl: "repeat(6, 1fr)",
             },
           }}
         >
@@ -124,7 +126,20 @@ function Wishlist() {
           ))}
         </Box>
       ) : (
-        <Box sx={{ textAlign: "center", py: 4 }}>No items in Wishlist</Box>
+        <Box
+          sx={{
+            padding: "10px 40px 35px",
+            maxWidth: 600,
+            mx: "auto",
+            background: theme.grey,
+            borderRadius: 2,
+            boxShadow: 3,
+          }}
+        >
+          <Typography variant="body1" sx={{ textAlign: "center", mt: 3 }}>
+            No items in Wishlist
+          </Typography>
+        </Box>
       )}
     </Box>
   );

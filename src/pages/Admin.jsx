@@ -107,7 +107,7 @@ function Admin() {
   };
 
   return (
-    <Box>
+    <Box sx={{ mt: 2 }}>
       <Tabs
         value={tabIndex}
         onChange={(e, newValue) => setTabIndex(newValue)}
@@ -124,6 +124,7 @@ function Admin() {
           sx={{
             color: theme.white,
             fontSize: "14px",
+            fontWeight: 600,
             "&.Mui-selected": {
               color: theme.yellow,
             },
@@ -134,6 +135,7 @@ function Admin() {
           sx={{
             color: theme.white,
             fontSize: "14px",
+            fontWeight: 600,
             "&.Mui-selected": {
               color: theme.yellow,
             },
@@ -152,9 +154,9 @@ function Admin() {
             }}
           >
             <CustomTypography
-              heading={true}
-              value={"Manage Products"}
-              sx={{ fontSize: "18px", fontWeight: 600 }}
+              heading={false}
+              value={"Create and Update Products"}
+              sx={{ fontSize: "16px", fontWeight: 600, color: theme.yellow }}
             />
             <CustomButton
               buttonText={"Add New Product"}
@@ -168,7 +170,14 @@ function Admin() {
 
           <Box>
             <Box sx={{ boxShadow: 2, borderRadius: 2, background: theme.grey }}>
-              <List>
+              <List
+                sx={{
+                  "&.MuiList-root": {
+                    maxHeight: "calc(100vh - 350px)",
+                    overflow: "scroll",
+                  },
+                }}
+              >
                 {productsFromApi.map((product, index) => (
                   <React.Fragment key={product.id}>
                     <ListItem

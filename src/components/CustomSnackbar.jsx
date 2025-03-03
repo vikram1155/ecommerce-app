@@ -18,7 +18,7 @@ const CustomSnackbar = () => {
       autoHideDuration={3000}
       onClose={handleClose}
       message={message}
-      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       sx={{
         "& .MuiSnackbarContent-message": {
           display: "flex",

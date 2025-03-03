@@ -308,7 +308,7 @@ function LoginPage({ setAuthenticated }) {
 
         {/* Error Message */}
         {error && (
-          <Typography sx={{ color: "red", mt: 2, fontSize: "12px" }}>
+          <Typography sx={{ color: "red", mt: 2, fontSize: "10px" }}>
             {error}!
           </Typography>
         )}

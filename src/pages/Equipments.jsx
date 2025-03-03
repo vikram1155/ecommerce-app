@@ -10,9 +10,7 @@ function Equipments() {
   const [productsFromApi, setProductsFromApi] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-
   const isMobile = useMediaQuery("(max-width: 650px)");
-
   const [filters, setFilters] = useState({
     priceRange: [0, 0],
     selectedCategories: [],
@@ -20,7 +18,6 @@ function Equipments() {
     selectedOffer: "",
     minMax: [0, 0],
   });
-
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -28,7 +25,7 @@ function Equipments() {
       try {
         const response = await getAllProducts();
         if (response?.data) {
-          setProductsFromApi(response.data); // Ensure it's set
+          setProductsFromApi(response.data);
           dispatch(setProductsRedux(response.data));
         }
       } catch (error) {
@@ -51,7 +48,7 @@ function Equipments() {
     setFilters((prevFilters) => ({
       ...prevFilters,
       priceRange: [min, max],
-      minMax: [min, max], // Store original min/max
+      minMax: [min, max],
     }));
   }, [productsFromApi]);
 
@@ -89,9 +86,11 @@ function Equipments() {
         )
       )
     );
+
     setFilteredProducts(filteredEquipmentList);
   }, [filters, productsFromApi]);
 
+  // JSX
   return (
     <Box>
       {!isMobile && (
@@ -102,16 +101,12 @@ function Equipments() {
         />
       )}
       <Box ml={!isMobile ? "250px" : "0"}>
-        {filteredProducts.length ? (
-          <CustomProductList
-            list={filteredProducts}
-            filters={filters}
-            setFilters={setFilters}
-            setFilteredProducts={setFilteredProducts}
-          />
-        ) : (
-          <p>No products available</p>
-        )}
+        <CustomProductList
+          filteredProducts={filteredProducts}
+          filters={filters}
+          setFilters={setFilters}
+          setFilteredProducts={setFilteredProducts}
+        />
       </Box>
     </Box>
   );

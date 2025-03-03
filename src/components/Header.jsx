@@ -156,7 +156,7 @@ function Header() {
         alignItems: "center",
         justifyContent: "space-between",
         backgroundColor: theme.black2,
-        padding: "10px 20px",
+        padding: "15px 20px",
         color: "white",
         width: "calc(100% - 40px)",
         float: "right",
@@ -175,7 +175,7 @@ function Header() {
       >
         {isMobile && (
           <MenuRoundedIcon
-            sx={{ fontSize: 20, cursor: "pointer", color: theme.yellow }}
+            sx={{ fontsize: "20px", cursor: "pointer", color: theme.yellow }}
             onClick={toggleDrawer(true)}
           />
         )}
@@ -183,17 +183,7 @@ function Header() {
           <img src={logo} alt="Logo" style={{ width: "24px" }} />
         </Box>
 
-        {/* <Typography
-          onClick={() => navigate("/")}
-          sx={{
-            cursor: "pointer",
-            color: theme.yellow,
-            fontWeight: 600,
-            textTransform: "uppercase",
-          }}
-        >
-          Strength Hub
-        </Typography> */}
+        {!isMobile && <Box sx={{ width: "100px" }}></Box>}
       </Box>
 
       {/* display these if screen size > 768px  */}
@@ -216,23 +206,23 @@ function Header() {
       >
         <IconButton onClick={() => navigate("/wishlist")}>
           <FavoriteRoundedIcon
-            sx={{ fontSize: 20, cursor: "pointer", color: theme.yellow }}
+            sx={{ fontsize: "20px", cursor: "pointer", color: theme.yellow }}
           />
         </IconButton>
         <IconButton onClick={() => navigate("/checkout")}>
           <ShoppingCartRoundedIcon
-            sx={{ fontSize: 20, cursor: "pointer", color: theme.yellow }}
+            sx={{ fontsize: "20px", cursor: "pointer", color: theme.yellow }}
           />
         </IconButton>
         <IconButton onClick={() => navigate("/profile")}>
           <AccountCircleRoundedIcon
-            sx={{ fontSize: 20, cursor: "pointer", color: theme.yellow }}
+            sx={{ fontsize: "20px", cursor: "pointer", color: theme.yellow }}
           />
         </IconButton>
         {adminAccess && (
           <IconButton onClick={() => navigate("/admin")}>
             <AdminPanelSettingsRoundedIcon
-              sx={{ fontSize: 20, cursor: "pointer", color: theme.yellow }}
+              sx={{ fontsize: "20px", cursor: "pointer", color: theme.yellow }}
             />
           </IconButton>
         )}

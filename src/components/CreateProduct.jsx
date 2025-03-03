@@ -7,6 +7,8 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import CustomTextField from "../customComponents/CustomTextfield";
 import CustomButton from "../customComponents/CustomButton";
 import CustomSelect from "../customComponents/CustomSelect";
+import { useDispatch } from "react-redux";
+import { showSnackbar } from "../redux/snackbarSlice";
 
 const productFields = {
   common: [
@@ -14,7 +16,7 @@ const productFields = {
     { name: "weight", label: "Weight" },
     { name: "category", label: "Category" },
     { name: "price", label: "Price", type: "number" },
-    // { name: "ratings", label: "Ratings", type: "number" },
+    { name: "image", label: "Paste Image URL" },
     // { name: "no_of_ratings", label: "Number of Ratings", type: "number" },
     { name: "description", label: "Description" },
     { name: "offer", label: "Offer (%)", type: "number" },
@@ -43,6 +45,8 @@ const CreateProduct = ({
   type,
 }) => {
   const [validations, setValidations] = useState("");
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (productData.type === "Equipments") {
@@ -93,7 +97,6 @@ const CreateProduct = ({
 
     let errors = {};
 
-    // Validate after computing finalProductData
     const allFields = [
       ...productFields.common,
       ...(productFields[finalProductData.type.toLowerCase().replace("-", "")] ||
@@ -112,13 +115,12 @@ const CreateProduct = ({
       }
     });
 
-    // If there are errors, stop submission and update the state
     if (Object.keys(errors).length > 0) {
       setValidations(errors);
       return;
     }
 
-    setValidations({}); // Clear errors if validation passes
+    setValidations({});
 
     try {
       const response =
@@ -126,6 +128,13 @@ const CreateProduct = ({
           ? await postProduct(finalProductData)
           : await updateProduct(finalProductData.productId, finalProductData);
 
+      dispatch(
+        showSnackbar(
+          type === "create"
+            ? "Product Created Sucessfully!"
+            : "Product Updated Sucessfully!"
+        )
+      );
       handleCloseModal();
     } catch (error) {
       console.error(
@@ -146,7 +155,6 @@ const CreateProduct = ({
         gap: 2,
         width: "100%",
         mx: "auto",
-        mt: 4,
         boxShadow: 3,
         borderRadius: 2,
         bgcolor: theme.black2,
@@ -154,7 +162,11 @@ const CreateProduct = ({
         overflowY: "scroll",
         maxWidth: "400px",
         margin: "auto",
-        position: "relative",
+        position: "absolute",
+        left: "50%",
+        top: "50%",
+        WebkitTransform: "translate(-50%, -50%)",
+        transform: "translate(-50%, -50%)",
       }}
     >
       <Box sx={{ p: 3, pb: 1 }}>
@@ -162,7 +174,7 @@ const CreateProduct = ({
           <CustomTypography
             heading
             value={type === "create" ? "Create Product" : "Update Product"}
-            sx={{ fontSize: "18px", fontWeight: 600 }}
+            sx={{ fontSize: "16px", fontWeight: 600 }}
           />
           <IconButton onClick={handleCloseModal}>
             <CloseRoundedIcon sx={{ color: theme.yellow }} />
@@ -218,7 +230,7 @@ const CreateProduct = ({
                 key={name}
                 label={label}
                 name={name}
-                value={productData.offer}
+                value={productData.veg_nonveg}
                 onChange={handleInputChange}
                 options={["Veg", "Non Veg"]}
                 required

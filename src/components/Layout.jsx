@@ -9,10 +9,10 @@ const Layout = ({ children, home = false }) => {
       <Header />
       <Box
         sx={{
-          minHeight: "calc(100vh - 140px)",
+          minHeight: "calc(100vh - 150px)",
           px: home ? 0 : 2.5,
-          pt: 7,
-          pb: 5.5,
+          pt: 9,
+          pb: 8,
         }}
       >
         {children}

@@ -47,7 +47,7 @@ const Home = () => {
     { name: "Equipments", routeTo: "/equipments", image: EquipmentsImage },
     {
       name: "Protein Rich  Foods",
-      routeTo: "/equipments",
+      routeTo: "/protein-store",
       image: ProteinFoodsImage,
     },
     { name: "Supplements", routeTo: "/supplements", image: SupplementsImage },
@@ -61,7 +61,7 @@ const Home = () => {
       try {
         const response = await getAllProducts();
         if (response?.data) {
-          setTodaysDealProducts(response.data); // Ensure it's set
+          setTodaysDealProducts(response.data); 
           dispatch(setProductsRedux(response.data));
         }
       } catch (error) {
@@ -84,10 +84,9 @@ const Home = () => {
     <Box>
       {/* Section 1: Hero Banner */}
       <HeroSection onClick={handleShopNowButtonClick} />
-
       {/* Section 2: Categories */}
       <Box id="section3"> </Box>
-      <br></br>
+      <br></br> <br></br>
       <CustomTypography
         heading={true}
         value="Categories"
@@ -162,7 +161,7 @@ const Home = () => {
                 />
               </Box>
               <Box display={"flex"} alignItems={"center"} gap={1}>
-                {/* <FitnessCenterRoundedIcon sx={{ fontSize: "20px" }} /> */}
+                {/* <FitnessCenterRoundedIcon sx={{ fontSize: "18px" }} /> */}
                 <SVG
                   src={
                     category.name === "Equipments"
@@ -181,14 +180,13 @@ const Home = () => {
                 <CustomTypography
                   heading={false}
                   value={`${category.name}`}
-                  sx={{ fontSize: "14px", textAlign: "center" }}
+                  sx={{ fontSize: "12px", textAlign: "center" }}
                 />
               </Box>
             </Box>
           </Box>
         ))}
       </Box>
-
       <TodayDeals todaysDealProducts={todaysDealProducts} />
       <Box
         sx={{
@@ -201,7 +199,7 @@ const Home = () => {
           width: "70%",
         }}
       >
-        <FormatQuoteIcon sx={{ fontSize: 80 }} />
+        <FormatQuoteIcon sx={{ fontSize: "80px" }} />
         <Typography
           variant={"h6"}
           fontWeight={700}

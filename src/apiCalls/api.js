@@ -106,7 +106,7 @@ export const getOrdersByUser = async (userId) => {
 
 export const postOrdersByUser = async (data) => {
   try {
-    const response = await api.post(API_ENDPOINTS.ORDERS, data);
+    const response = await api.post(`${API_ENDPOINTS.ORDERS}/create`, data);
     return response.data;
   } catch (error) {
     console.error("Error posting cart data:", error);

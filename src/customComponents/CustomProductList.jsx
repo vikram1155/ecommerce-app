@@ -1,4 +1,4 @@
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton, useMediaQuery } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import CustomProductCard from "./CustomProductCard";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
@@ -26,7 +26,7 @@ const FilterChip = ({ label, onRemove }) => (
     <CustomTypography
       heading={false}
       value={label}
-      sx={{ fontWeight: 400, fontSize: "14px", color: theme.yellow }}
+      sx={{ fontWeight: 400, fontSize: "12px", color: theme.yellow }}
     />
     <IconButton sx={{ p: 0 }} onClick={onRemove}>
       <CloseRoundedIcon sx={{ fill: theme.yellow }} />
@@ -34,7 +34,14 @@ const FilterChip = ({ label, onRemove }) => (
   </Box>
 );
 
-function CustomProductList({ list, filters, setFilters, setFilteredProducts }) {
+function CustomProductList({
+  filteredProducts,
+  filters,
+  setFilters,
+  setFilteredProducts,
+}) {
+  const isMobile = useMediaQuery("(max-width: 450px)");
+
   const handleRemoveFilter = (key, item) => {
     setFilters((prevFilters) => {
       const updatedFilters = { ...prevFilters };
@@ -49,7 +56,7 @@ function CustomProductList({ list, filters, setFilters, setFilteredProducts }) {
           updatedFilters[key] = updatedFilters[key].filter((i) => i !== item);
         }
       } else {
-        delete updatedFilters[key];
+        updatedFilters[key] = "";
       }
 
       return updatedFilters;
@@ -112,50 +119,67 @@ function CustomProductList({ list, filters, setFilters, setFilteredProducts }) {
   // JSX
   return (
     <Box>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, pb: 2 }}>
-        {Object.entries(filters || {})
-          .filter(([key]) => key !== "minMax")
-          .map(([key, value]) =>
-            Array.isArray(value) ? (
-              value.map((item, index) => (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          pb: 2,
+          flexFlow: "wrap",
+        }}
+      >
+        {Object.entries(filters || {}).map(([key, value]) =>
+          key === "priceRange" &&
+          (filters.minMax[0] !== value[0] || filters.minMax[1] !== value[1]) ? (
+            value.map((item, index) => {
+              return (
+                item > 0 && (
+                  <FilterChip
+                    key={`${key}-${item}`}
+                    label={index === 0 ? `Min - ₹${item}` : `Max - ₹${item}`}
+                    onRemove={() => handleRemoveFilter(key, item)}
+                  />
+                )
+              );
+            })
+          ) : key === "selectedCategories" ? (
+            value.map((item, index) => {
+              return (
                 <FilterChip
                   key={`${key}-${item}`}
-                  label={
-                    key === "priceRange"
-                      ? index === 0
-                        ? `Min - ₹${item}`
-                        : `Max - ₹${item}`
-                      : item
-                  }
+                  label={item}
                   onRemove={() => handleRemoveFilter(key, item)}
                 />
-              ))
-            ) : value ? (
-              <FilterChip
-                key={key}
-                label={
-                  key === "selectedRating" ? `${value} ⭐` : `Above ${value}`
-                }
-                onRemove={() => handleRemoveFilter(key)}
-              />
-            ) : null
-          )}
+              );
+            })
+          ) : value && (key === "selectedRating" || key === "selectedOffer") ? (
+            <FilterChip
+              key={key}
+              label={
+                key === "selectedRating" ? `${value} ⭐` : `Above ${value}`
+              }
+              onRemove={() => handleRemoveFilter(key)}
+            />
+          ) : null
+        )}
       </Box>
       {/* Grid for Product Cards */}
-      {list.length ? (
+      {filteredProducts.length ? (
         <Box
           sx={{
             display: "grid",
             gap: 2,
-            gridTemplateColumns: {
-              xs: "repeat(2, 1fr)",
-              md: "repeat(3, 1fr)",
-              lg: "repeat(4, 1fr)",
-              xl: "repeat(5, 1fr)",
-            },
+            gridTemplateColumns: isMobile
+              ? "repeat(1, 1fr)"
+              : {
+                  xs: "repeat(2, 1fr)",
+                  md: "repeat(3, 1fr)",
+                  lg: "repeat(4, 1fr)",
+                  xl: "repeat(5, 1fr)",
+                },
           }}
         >
-          {list.map((listItem) => (
+          {filteredProducts.map((listItem) => (
             <CustomProductCard
               item={listItem}
               setFilteredProducts={setFilteredProducts}
@@ -165,7 +189,16 @@ function CustomProductList({ list, filters, setFilters, setFilteredProducts }) {
           ))}
         </Box>
       ) : (
-        <>No Products</>
+        <Box
+          sx={{
+            display: "flex",
+            py: 3,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          No Products available!
+        </Box>
       )}
     </Box>
   );

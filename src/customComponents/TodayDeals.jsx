@@ -21,7 +21,7 @@ function TodayDeals({ todaysDealProducts }) {
       <Box
         sx={{
           display: "flex",
-          gap: 3,
+          gap: { xs: 5, sm: 3 },
           alignItems: "center",
           justifyContent: "center",
           flexWrap: "wrap",
@@ -54,7 +54,7 @@ function TodayDeals({ todaysDealProducts }) {
                   alignItems: "center",
                   gap: 1,
                   background: theme.black2,
-                  p: 2,
+                  // p: 2,
                   borderRadius: 2,
                   cursor: "pointer",
                   maxWidth: "250px",
@@ -69,13 +69,17 @@ function TodayDeals({ todaysDealProducts }) {
                 <Box
                   sx={{
                     height: { xs: "250px", sm: "200px" },
+                    minWidth: { xs: "200px", sm: "250px" },
                     display: "flex",
                     justifyContent: "center",
+                    backgroundColor: "#fff",
                   }}
                 >
                   <img
                     src={
-                      todaysDealProduct.type === "Equipments"
+                      todaysDealProduct?.image
+                        ? todaysDealProduct?.image
+                        : todaysDealProduct.type === "Equipments"
                         ? EquipmentsImage
                         : todaysDealProduct.type === "Supplements"
                         ? SupplementsImage
@@ -103,7 +107,7 @@ function TodayDeals({ todaysDealProducts }) {
                     value={todaysDealProduct.price}
                     sx={{
                       fontWeight: 400,
-                      fontSize: "14px",
+                      fontSize: "12px",
                       textDecoration: "line-through",
                       color: "grey !important",
                     }}
@@ -114,14 +118,14 @@ function TodayDeals({ todaysDealProducts }) {
                       todaysDealProduct.price -
                       (todaysDealProduct.price * todaysDealProduct.offer) / 100
                     }`}
-                    sx={{ fontWeight: 400, fontSize: "18px" }}
+                    sx={{ fontWeight: 400, fontSize: "16px" }}
                   />
                   <CustomTypography
                     heading={false}
                     value={`${todaysDealProduct.offer}% Off`}
                     sx={{
                       fontWeight: 400,
-                      fontSize: "14px",
+                      fontSize: "12px",
                       color: `${theme.yellow} !important`,
                     }}
                   />

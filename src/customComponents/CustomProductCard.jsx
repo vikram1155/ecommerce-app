@@ -6,6 +6,9 @@ import { theme } from "../utils/theme";
 import CustomTypography from "./CustomTypography";
 import CustomButton from "./CustomButton";
 import { useLocation, useNavigate } from "react-router-dom";
+import EquipmentsImage from "../assets/equipments.jpeg";
+import SupplementsImage from "../assets/supplements.jpeg";
+import ProteinFoodsImage from "../assets/proteinFoods.jpeg";
 
 function CustomProductCard({
   item,
@@ -14,14 +17,27 @@ function CustomProductCard({
   handleFavoriteButtonClick,
 }) {
   const navigate = useNavigate();
-  const location = useLocation();
+
+  const altImage =
+    item.type === "Equipments"
+      ? EquipmentsImage
+      : item.type === "Supplements"
+      ? SupplementsImage
+      : ProteinFoodsImage;
+
+  const url =
+    item.type === "Equipments"
+      ? "equipments"
+      : item.type === "Supplements"
+      ? "supplements"
+      : "protein-store";
 
   //JSX
   return (
     <Box
       sx={{
         borderRadius: 2,
-        border: `0.5px solid #ffbd0033`,
+        border: `1px solid #ffbd0033`,
         p: 2,
         boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
         display: "flex",
@@ -37,7 +53,7 @@ function CustomProductCard({
         },
       }}
       onClick={() => {
-        navigate(`${location.pathname}/${item.productId}`);
+        navigate(`/${url}/${item.productId}`);
       }}
     >
       {/* Favorite Icon */}
@@ -62,13 +78,13 @@ function CustomProductCard({
           display: "flex",
           justifyContent: "center",
           mb: 1,
+          background: "#fff",
+          borderRadius: "4px",
+          padding: "5px",
         }}
       >
         <img
-          src={
-            item.image ||
-            "https://dummyimage.com/800x400&text=placeholder-image"
-          }
+          src={item?.image || altImage}
           alt={item.name}
           style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }}
         />
@@ -87,7 +103,7 @@ function CustomProductCard({
         <CustomTypography
           heading={true}
           value={item.name}
-          sx={{ fontWeight: 600, fontSize: "14px" }}
+          sx={{ fontWeight: 600, fontSize: "12px" }}
         />
 
         <Box display={"flex"} gap={1} alignItems={"center"}>
@@ -96,7 +112,7 @@ function CustomProductCard({
             value={`${item.price + (item.price * item.offer) / 100}`}
             sx={{
               fontWeight: 400,
-              fontSize: "14px",
+              fontSize: "12px",
               textDecoration: "line-through",
               color: "grey !important",
             }}
@@ -104,14 +120,14 @@ function CustomProductCard({
           <CustomTypography
             heading={false}
             value={`₹${item.price}`}
-            sx={{ fontWeight: 400, fontSize: "18px" }}
+            sx={{ fontWeight: 400, fontSize: "16px" }}
           />
           <CustomTypography
             heading={false}
             value={`${item.offer}% Off`}
             sx={{
               fontWeight: 400,
-              fontSize: "14px",
+              fontSize: "12px",
               color: `${theme.yellow} !important`,
             }}
           />
@@ -120,7 +136,7 @@ function CustomProductCard({
           <CustomTypography
             heading={false}
             value={`⭐ ${item.ratings} (${item.no_of_ratings})`}
-            sx={{ fontWeight: 400, fontSize: "12px" }}
+            sx={{ fontWeight: 400, fontSize: "10px" }}
           />
         ) : (
           <></>
@@ -129,7 +145,7 @@ function CustomProductCard({
         {/* Add to Cart Button */}
         <CustomButton
           variant="contained"
-          iconSrc={<ShoppingCartIcon sx={{ fontSize: "16px" }} />}
+          iconSrc={<ShoppingCartIcon sx={{ fontSize: "14px" }} />}
           altText={"Shopping Cart"}
           buttonText={"View Product"}
         />

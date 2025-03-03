@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Box,
+  Chip,
   CircularProgress,
   Typography,
   useMediaQuery,
@@ -158,14 +159,14 @@ function Checkout() {
           textAlign: "center",
           fontWeight: 600,
           padding: "30px 0 50px",
-          fontSize: 18,
+          fontSize: "14px",
         }}
       />
       {buttonClick ? (
         orderSuccessPage ? (
           <Box
             sx={{
-              height: "calc(100vh - 116px)",
+              height: "calc(100vh - 280px)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -175,7 +176,7 @@ function Checkout() {
           >
             <CustomTypography
               value="Order Placed Successfully!"
-              sx={{ fontSize: "20px", fontWeight: 600 }}
+              sx={{ fontSize: "18px", fontWeight: 600 }}
               heading={true}
             />
             <br></br>
@@ -188,11 +189,12 @@ function Checkout() {
         ) : (
           <Box
             sx={{
-              height: "calc(100vh - 116px)",
+              height: "calc(100vh - 280px)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               flexDirection: "column",
+              textAlign: "center",
             }}
           >
             <CircularProgress sx={{ color: theme.yellow }} />
@@ -203,7 +205,7 @@ function Checkout() {
       ) : (
         <Box
           sx={{
-            padding: "10px 40px 35px",
+            padding: { xs: "10px 16px 35px", sm: "10px 40px 35px" },
             maxWidth: 600,
             mx: "auto",
             background: theme.grey,
@@ -222,11 +224,6 @@ function Checkout() {
                   py={3}
                 >
                   <Box display={"flex"} gap={1} flexDirection={"column"}>
-                    <CustomTypography
-                      heading={true}
-                      value={item.name}
-                      sx={{ fontWeight: 400, fontSize: "18px" }}
-                    />
                     <Box
                       display={"flex"}
                       gap={1}
@@ -235,19 +232,34 @@ function Checkout() {
                     >
                       <CustomTypography
                         heading={true}
-                        value={`(${item.category})`}
-                        sx={{ fontWeight: 400, fontSize: "18px" }}
+                        value={item.name}
+                        sx={{ fontWeight: 400, fontSize: "14px" }}
                       />
+
                       <CustomTypography
                         heading={false}
                         value={`x ${item.quantity} item(s)`}
-                        sx={{ fontWeight: 400, fontSize: "16px" }}
+                        sx={{ fontWeight: 400, fontSize: "12px" }}
                       />
                     </Box>
+                    {/* <CustomTypography
+                      heading={true}
+                      value={`(${item.category})`}
+                      sx={{ fontWeight: 400, fontSize: "14px" }}
+                    /> */}
+                    <Chip
+                      label={item.category}
+                      sx={{
+                        backgroundColor: theme.yellow,
+                        color: "#000",
+                        fontWeight: "bold",
+                        width: "fit-content",
+                      }}
+                    />
                     <CustomTypography
                       heading={false}
                       value={`Delivery in ${item.etd} day(s)`}
-                      sx={{ fontWeight: 400, fontSize: "16px" }}
+                      sx={{ fontWeight: 400, fontSize: "14px" }}
                     />
                     <CustomButton
                       variant="contained"
@@ -258,7 +270,12 @@ function Checkout() {
                     />
                   </Box>
 
-                  <Box display={"flex"} gap={1} alignItems={"center"}>
+                  <Box
+                    display={"flex"}
+                    gap={1}
+                    alignItems={"center"}
+                    flexDirection={{ xs: "column", sm: "row" }}
+                  >
                     <CustomTypography
                       heading={false}
                       value={`${
@@ -267,7 +284,7 @@ function Checkout() {
                       }`}
                       sx={{
                         fontWeight: 400,
-                        fontSize: "14px",
+                        fontSize: "12px",
                         textDecoration: "line-through",
                         color: "grey !important",
                       }}
@@ -275,14 +292,14 @@ function Checkout() {
                     <CustomTypography
                       heading={false}
                       value={`₹${item.quantity * item.price}`}
-                      sx={{ fontWeight: 400, fontSize: "18px" }}
+                      sx={{ fontWeight: 400, fontSize: "16px" }}
                     />
                     <CustomTypography
                       heading={false}
                       value={`${item.offer}% Off`}
                       sx={{
                         fontWeight: 400,
-                        fontSize: "14px",
+                        fontSize: "12px",
                         color: `${theme.yellow} !important`,
                       }}
                     />
@@ -307,7 +324,7 @@ function Checkout() {
                     value={totalPriceOffer}
                     sx={{
                       fontWeight: 400,
-                      fontSize: "14px",
+                      fontSize: "12px",
                       textDecoration: "line-through",
                       color: "grey !important",
                     }}

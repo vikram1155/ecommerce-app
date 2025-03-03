@@ -23,6 +23,8 @@ import {
   updateProduct,
 } from "../apiCalls/api";
 import CustomButton from "../customComponents/CustomButton";
+import { showSnackbar } from "../redux/snackbarSlice";
+import { useDispatch } from "react-redux";
 
 function Profile() {
   const [activeTab, setActiveTab] = useState(0);
@@ -32,6 +34,7 @@ function Profile() {
   const [openRatingDialog, setOpenRatingDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [ratingValue, setRatingValue] = useState(0);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const getOrdersByUserFn = async () => {
@@ -110,6 +113,7 @@ function Profile() {
         }));
       }
 
+      dispatch(showSnackbar("Rating Sumbitted!"));
       setOpenRatingDialog(false);
     } catch (error) {
       console.error("Failed to update product rating", error);
@@ -135,6 +139,7 @@ function Profile() {
           sx={{
             color: theme.white,
             fontSize: "14px",
+            fontWeight: 600,
             "&.Mui-selected": {
               color: theme.yellow,
             },
@@ -145,6 +150,7 @@ function Profile() {
           sx={{
             color: theme.white,
             fontSize: "14px",
+            fontWeight: 600,
             "&.Mui-selected": {
               color: theme.yellow,
             },
@@ -198,7 +204,14 @@ function Profile() {
 
       {activeTab === 1 && (
         <Box sx={{ boxShadow: 2, borderRadius: 2, background: theme.grey }}>
-          <List>
+          <List
+            sx={{
+              "&.MuiList-root": {
+                maxHeight: "calc(100vh - 250px)",
+                overflow: "scroll",
+              },
+            }}
+          >
             {orderHistoryList?.ordersList?.length ? (
               orderHistoryList.ordersList
                 .sort(
@@ -209,15 +222,16 @@ function Profile() {
                   <React.Fragment key={order.id}>
                     <ListItem
                       sx={{
-                        p: 3,
+                        p: { xs: 2, sm: 3 },
                         display: "flex",
                         justifyContent: "space-between",
+                        gap: 1,
                       }}
                     >
                       <Box>
                         <Typography
                           variant="subtitle1"
-                          sx={{ color: theme.white }}
+                          sx={{ color: theme.yellow }}
                         >
                           <strong>{order.productName}</strong> (x
                           {order.quantity})
@@ -258,7 +272,7 @@ function Profile() {
                                 ? "🔜"
                                 : "⭐"
                             }`}
-                            sx={{ mt: 2, width: "135px" }}
+                            sx={{ mt: 2, width: "120px" }}
                             disabled
                           />
                         </span>
@@ -270,7 +284,9 @@ function Profile() {
                   </React.Fragment>
                 ))
             ) : (
-              <>No Orders</>
+              <Typography variant="body1" sx={{ textAlign: "center", my: 3 }}>
+                No orders placed yet!
+              </Typography>
             )}
           </List>
         </Box>
@@ -279,20 +295,32 @@ function Profile() {
       <Dialog
         open={openRatingDialog}
         onClose={() => setOpenRatingDialog(false)}
+        sx={{
+          "& .MuiPaper-root": {
+            minWidth: "350px",
+          },
+          "& .MuiDialog-paper": { backgroundColor: theme.darkGrey },
+        }}
       >
-        <DialogTitle>Rate {selectedProduct?.name}</DialogTitle>
+        <DialogTitle sx={{ color: theme.white }}>
+          Rate Product - {selectedProduct?.name}
+        </DialogTitle>
         <DialogContent>
           <Rating
             name="product-rating"
             value={ratingValue}
             onChange={(event, newValue) => setRatingValue(newValue)}
+            sx={{ "& .MuiSvgIcon-root": { color: theme.yellow } }}
           />
         </DialogContent>
         <DialogActions>
-          <CustomButton buttonText="Submit" onClick={handleSubmitRating} />
           <CustomButton
             buttonText="Cancel"
             onClick={() => setOpenRatingDialog(false)}
+          />
+          <CustomButton
+            buttonText="Rate Product"
+            onClick={handleSubmitRating}
           />
         </DialogActions>
       </Dialog>

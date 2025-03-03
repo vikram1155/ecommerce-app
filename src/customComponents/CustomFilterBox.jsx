@@ -39,16 +39,6 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
     }));
   };
 
-  // Handle Rating Change
-  const handleRatingChange = (event) => {
-    setFilters((prev) => ({ ...prev, selectedRating: event.target.value }));
-  };
-
-  // Handle Offer Change
-  const handleOfferChange = (event) => {
-    setFilters((prev) => ({ ...prev, selectedOffer: event.target.value }));
-  };
-
   return (
     <Box
       sx={{
@@ -66,7 +56,7 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
         <CustomTypography
           heading={true}
           value={"Price Range"}
-          sx={{ fontWeight: 600, fontSize: "14px" }}
+          sx={{ fontWeight: 600, fontSize: "12px" }}
         />
         <Slider
           value={filters.priceRange}
@@ -96,7 +86,7 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
               "& .MuiOutlinedInput-root": {
                 color: theme.white,
                 p: 0,
-                fontSize: "14px",
+                fontSize: "12px",
               },
             }}
             value={filters.priceRange[0]}
@@ -118,7 +108,7 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
               "& .MuiOutlinedInput-root": {
                 color: theme.white,
                 p: 0,
-                fontSize: "14px",
+                fontSize: "12px",
               },
             }}
             value={filters.priceRange[1]}
@@ -139,7 +129,7 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
           <CustomTypography
             heading={true}
             value={"Category"}
-            sx={{ fontWeight: 600, fontSize: "14px" }}
+            sx={{ fontWeight: 600, fontSize: "12px" }}
           />
         </AccordionSummary>
         <AccordionDetails>
@@ -156,7 +146,7 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
                       color: theme.white,
                       "&.MuiCheckbox-root.Mui-checked": { color: theme.yellow },
                       svg: {
-                        fontSize: "16px",
+                        fontSize: "14px",
                       },
                     }}
                   />
@@ -165,7 +155,7 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
                 sx={{
                   textTransform: "capitalize",
                   color: theme.white,
-                  "& .MuiTypography-root": { fontSize: "14px" },
+                  "& .MuiTypography-root": { fontSize: "12px" },
                 }}
               />
             ))}
@@ -183,11 +173,11 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
           <CustomTypography
             heading={true}
             value={"Rating"}
-            sx={{ fontWeight: 600, fontSize: "14px" }}
+            sx={{ fontWeight: 600, fontSize: "12px" }}
           />
         </AccordionSummary>
         <AccordionDetails>
-          <RadioGroup
+          {/* <RadioGroup
             value={filters.selectedRating}
             onChange={handleRatingChange}
           >
@@ -204,7 +194,27 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
                 sx={{ color: theme.white }}
               />
             ))}
-          </RadioGroup>
+          </RadioGroup> */}
+          {["2", "3", "4"].map((rating) => (
+            <FormControlLabel
+              key={rating}
+              control={
+                <Checkbox
+                  checked={filters.selectedRating === rating}
+                  onChange={() =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      selectedRating:
+                        prev.selectedRating === rating ? "" : rating,
+                    }))
+                  }
+                  sx={{ "& .MuiSvgIcon-root": { color: theme.yellow } }}
+                />
+              }
+              label={`${rating}+ Stars`}
+              sx={{ color: theme.white }}
+            />
+          ))}
         </AccordionDetails>
       </Accordion>
 
@@ -218,11 +228,11 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
           <CustomTypography
             heading={true}
             value={"Offers"}
-            sx={{ fontWeight: 600, fontSize: "14px" }}
+            sx={{ fontWeight: 600, fontSize: "12px" }}
           />
         </AccordionSummary>
         <AccordionDetails>
-          <RadioGroup
+          {/* <RadioGroup
             value={filters.selectedOffer}
             onChange={handleOfferChange}
           >
@@ -239,7 +249,26 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
                 sx={{ color: theme.white }}
               />
             ))}
-          </RadioGroup>
+          </RadioGroup> */}
+          {["10%", "20%", "30%"].map((offer) => (
+            <FormControlLabel
+              key={offer}
+              control={
+                <Checkbox
+                  checked={filters.selectedOffer === offer}
+                  onChange={() =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      selectedOffer: prev.selectedOffer === offer ? "" : offer,
+                    }))
+                  }
+                  sx={{ "& .MuiSvgIcon-root": { color: theme.yellow } }}
+                />
+              }
+              label={`${offer} Off`}
+              sx={{ color: theme.white }}
+            />
+          ))}
         </AccordionDetails>
       </Accordion>
     </Box>

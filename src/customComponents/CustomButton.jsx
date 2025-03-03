@@ -27,6 +27,7 @@ function CustomButton({
         backgroundColor: theme.black2,
         border: `1px solid ${theme.yellow}`,
         color: theme.white,
+        fontSize: "12px",
         ":hover": {
           color: theme.black,
           backgroundColor: theme.yellow,

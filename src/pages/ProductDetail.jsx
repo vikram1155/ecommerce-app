@@ -25,6 +25,7 @@ import { addOrUpdateOrder } from "../redux/orderListSlice";
 import { showSnackbar } from "../redux/snackbarSlice";
 import TodayDeals from "../customComponents/TodayDeals";
 import CustomTypography from "../customComponents/CustomTypography";
+import CustomLoader from "../customComponents/CustomLoader";
 
 const COLORS = ["#FF0000", "#00C49F", "#FFBB28"]; // Red for Protein, Green for Carbs, Yellow for Fat
 
@@ -138,7 +139,7 @@ function ProductDetail() {
   ];
 
   if (!product) {
-    return <Typography>Loading...</Typography>;
+    return <CustomLoader fullPage={true} />;
   }
 
   return (
@@ -158,17 +159,17 @@ function ProductDetail() {
           sx={{
             width: isMobile ? "100%" : "40%",
             height: "400px",
-            background: "#f3f3f3",
+            background: "#fff",
             borderRadius: "10px",
           }}
         >
           <img
-            src={product.image}
-            alt={product.name}
+            src={product?.image}
+            alt={product?.name}
             style={{
               width: "100%",
               height: "100%",
-              objectFit: "cover",
+              objectFit: "contain",
               borderRadius: "10px",
             }}
           />
@@ -188,9 +189,14 @@ function ProductDetail() {
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: !isTab ? "1fr 1fr" : "auto",
+              gridTemplateColumns: !isTab
+                ? product?.protein || product?.carbs || product?.fat
+                  ? "1fr 1fr"
+                  : "auto"
+                : "auto",
               alignItems: "center",
               position: "relative",
+              gap: 1,
             }}
           >
             <Box
@@ -208,6 +214,8 @@ function ProductDetail() {
                   position: "absolute",
                   right: 0,
                   top: "-10px",
+                  backgroundColor: theme.black,
+                  borderRadius: "100%",
                 }}
               >
                 <IconButton
@@ -223,7 +231,10 @@ function ProductDetail() {
               </Box>
               {/* Product Name & Price */}
               <Typography variant="h5" fontWeight="bold">
-                {product.name} | {product.description}
+                {product.name}
+              </Typography>
+              <Typography variant="body1" fontWeight="bold">
+                {product.description}
               </Typography>
               <Chip
                 label={product.category}
@@ -242,7 +253,7 @@ function ProductDetail() {
                   }`}
                   sx={{
                     fontWeight: 400,
-                    fontSize: "14px",
+                    fontSize: "12px",
                     textDecoration: "line-through",
                     color: "grey !important",
                   }}
@@ -250,14 +261,14 @@ function ProductDetail() {
                 <CustomTypography
                   heading={false}
                   value={`₹${product.price}`}
-                  sx={{ fontWeight: 400, fontSize: "18px" }}
+                  sx={{ fontWeight: 400, fontSize: "16px" }}
                 />
                 <CustomTypography
                   heading={false}
                   value={`${product.offer}% Off`}
                   sx={{
                     fontWeight: 400,
-                    fontSize: "14px",
+                    fontSize: "12px",
                     color: `${theme.yellow} !important`,
                   }}
                 />
@@ -267,8 +278,11 @@ function ProductDetail() {
               <Typography variant="body1">{product.features}</Typography>
               {/* Ratings & Purchases */}
               {product.no_of_ratings ? (
-                <Typography variant="body1">
-                  {product.no_of_ratings} happy customers!
+                <Typography variant="body1" sx={{ fontSize: "12px" }}>
+                  <span
+                    style={{ fontWeight: 700 }}
+                  >{`⭐ ${product.ratings}`}</span>
+                  {` | ${product.no_of_ratings} Ratings`}
                 </Typography>
               ) : (
                 <></>
@@ -282,78 +296,91 @@ function ProductDetail() {
                   display: isTab && "flex",
                   alignItems: isTab && "center",
                   gap: isTab && 3,
+                  flexDirection: isTab && "column",
                 }}
               >
-                <ResponsiveContainer
-                  width={150}
-                  height={150}
-                  style={{ padding: "20px 0" }}
-                >
-                  <PieChart>
-                    <Pie
-                      data={nutritionData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={60}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {nutritionData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
                 <Box
                   sx={{
-                    display: "flex",
-                    gap: 2,
-                    flexDirection: isTab && "column",
+                    display: isTab && "flex",
+                    alignItems: isTab && "center",
+                    gap: isTab && 3,
                   }}
                 >
-                  <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                    <Box
-                      sx={{
-                        height: "16px",
-                        width: "16px",
-                        bgcolor: "#FF0000",
-                        borderRadius: 1,
-                      }}
-                    ></Box>
-                    Protein
-                  </Box>
-                  <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                    <Box
-                      sx={{
-                        height: "16px",
-                        width: "16px",
-                        bgcolor: "#00C49F",
-                        borderRadius: 1,
-                      }}
-                    ></Box>
-                    Carbs
-                  </Box>
-                  <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                    <Box
-                      sx={{
-                        height: "16px",
-                        width: "16px",
-                        bgcolor: "#FFBB28",
-                        borderRadius: 1,
-                      }}
-                    ></Box>
-                    Fat
+                  <ResponsiveContainer
+                    width={150}
+                    height={150}
+                    style={{ padding: "20px 0", justifySelf: "center" }}
+                  >
+                    <PieChart>
+                      <Pie
+                        data={nutritionData}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={60}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {nutritionData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      flexDirection: isTab && "column",
+                    }}
+                  >
+                    <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                      <Box
+                        sx={{
+                          height: "16px",
+                          width: "16px",
+                          bgcolor: "#FF0000",
+                          borderRadius: 1,
+                        }}
+                      ></Box>
+                      Protein
+                    </Box>
+                    <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                      <Box
+                        sx={{
+                          height: "16px",
+                          width: "16px",
+                          bgcolor: "#00C49F",
+                          borderRadius: 1,
+                        }}
+                      ></Box>
+                      Carbs
+                    </Box>
+                    <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                      <Box
+                        sx={{
+                          height: "16px",
+                          width: "16px",
+                          bgcolor: "#FFBB28",
+                          borderRadius: 1,
+                        }}
+                      ></Box>
+                      Fat
+                    </Box>
                   </Box>
                 </Box>
+                <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
+                  (Values per 100g)
+                </Box>{" "}
               </Box>
             ) : (
               <></>
             )}
           </Box>
+          <br></br>
           <Box>
             {/* Quantity Selector */}
             <Box
@@ -390,7 +417,7 @@ function ProductDetail() {
             {/* Add to Cart Button */}
             <CustomButton
               variant="contained"
-              iconSrc={<ShoppingCartIcon sx={{ fontSize: "16px" }} />}
+              iconSrc={<ShoppingCartIcon sx={{ fontSize: "14px" }} />}
               altText={"Shopping Cart"}
               buttonText={product.inCart ? "Go To Cart" : "Add To Cart"}
               onClick={handleAddToCart}
