@@ -200,14 +200,13 @@ function LoginPage({ setAuthenticated }) {
             gap: "16px",
           }}
         >
-          {/* <CustomTypography heading={true} value="STRENGTH HUB" /> */}
           <Typography
             variant={useMediaQuery("(max-width:550px)") ? "h5" : "h4"}
             fontWeight={700}
             gutterBottom
             sx={{ textTransform: "uppercase" }}
           >
-            Strength Hub
+            Fit Hub
           </Typography>
         </Box>
         <Box

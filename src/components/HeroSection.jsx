@@ -52,16 +52,16 @@ const HeroSection = ({ onClick }) => {
           gutterBottom
           sx={{ textTransform: "uppercase" }}
         >
-          Strength Hub
+          Fit Hub
         </Typography>
 
         {/* Taglines */}
         <Typography
-          variant={isMobile ? "h6" : "h5"}
+          variant={isMobile ? "body" : "h5"}
           fontWeight={700}
           sx={{ color: theme.yellow, textTransform: "uppercase" }}
         >
-          Be Strong | Be Healthy
+          Be Strong | Be Healthy | Be Fit
         </Typography>
 
         {/* Website Description */}
