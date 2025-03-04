@@ -40,13 +40,15 @@ function Profile() {
     const getOrdersByUserFn = async () => {
       try {
         const response = await getOrdersByUser(currentUser?.userId);
-        setOrderHistoryList(response?.data);
+        if (response?.status?.code === 200) {
+          setOrderHistoryList(response?.data);
+        }
       } catch (error) {
-        console.log("Error getting orders");
+        dispatch(showSnackbar(`Error getting orders`));
       }
     };
     getOrdersByUserFn();
-  }, [currentUser?.userId]);
+  }, [currentUser?.userId, dispatch]);
 
   useEffect(() => {
     const getAllProductsFn = async () => {
@@ -167,18 +169,22 @@ function Profile() {
             {Object.entries(currentUser)
               .filter(
                 ([key]) =>
-                  key !== "userId" && key !== "admin" && key !== "favorites"
+                  key !== "userId" &&
+                  key !== "admin" &&
+                  key !== "favorites" &&
+                  key !== "password" &&
+                  key !== "_id"
               )
-              .map(([key, value]) => (
+              .map(([key, value], index) => (
                 <Box
                   sx={{
                     display: "flex",
                     justifyContent: "space-between",
                     p: 3,
                   }}
+                  key={`${key}-${index}`}
                 >
                   <Typography
-                    key={key}
                     sx={{
                       textTransform: "capitalize",
                       color: theme.white,
@@ -188,9 +194,7 @@ function Profile() {
                   </Typography>
 
                   <Typography
-                    key={key}
                     sx={{
-                      textTransform: key === "name" && "capitalize",
                       color: theme.white,
                     }}
                   >
@@ -219,7 +223,7 @@ function Profile() {
                     new Date(b.orderedOnDate) - new Date(a.orderedOnDate)
                 )
                 .map((order, index) => (
-                  <React.Fragment key={order.id}>
+                  <React.Fragment key={index}>
                     <ListItem
                       sx={{
                         p: { xs: 2, sm: 3 },
@@ -285,7 +289,7 @@ function Profile() {
                 ))
             ) : (
               <Typography variant="body1" sx={{ textAlign: "center", my: 3 }}>
-                No orders placed yet!
+                No Orders Placed Yet!
               </Typography>
             )}
           </List>
@@ -302,7 +306,7 @@ function Profile() {
           "& .MuiDialog-paper": { backgroundColor: theme.darkGrey },
         }}
       >
-        <DialogTitle sx={{ color: theme.white }}>
+        <DialogTitle sx={{ color: theme.white, fontSize: "14px" }}>
           Rate Product - {selectedProduct?.name}
         </DialogTitle>
         <DialogContent>

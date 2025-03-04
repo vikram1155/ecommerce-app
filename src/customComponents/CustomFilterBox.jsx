@@ -4,8 +4,6 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
-  RadioGroup,
-  Radio,
   Typography,
   Accordion,
   AccordionSummary,
@@ -146,7 +144,7 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
                       color: theme.white,
                       "&.MuiCheckbox-root.Mui-checked": { color: theme.yellow },
                       svg: {
-                        fontSize: "14px",
+                        fontSize: "16px",
                       },
                     }}
                   />
@@ -177,24 +175,6 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
           />
         </AccordionSummary>
         <AccordionDetails>
-          {/* <RadioGroup
-            value={filters.selectedRating}
-            onChange={handleRatingChange}
-          >
-            {["2", "3", "4"].map((rating) => (
-              <FormControlLabel
-                key={rating}
-                value={rating}
-                control={
-                  <Radio
-                    sx={{ "& .MuiSvgIcon-root": { color: theme.yellow } }}
-                  />
-                }
-                label={`${rating}+ Stars`}
-                sx={{ color: theme.white }}
-              />
-            ))}
-          </RadioGroup> */}
           {["2", "3", "4"].map((rating) => (
             <FormControlLabel
               key={rating}
@@ -208,11 +188,22 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
                         prev.selectedRating === rating ? "" : rating,
                     }))
                   }
-                  sx={{ "& .MuiSvgIcon-root": { color: theme.yellow } }}
+                  sx={{
+                    "& .MuiSvgIcon-root": {
+                      color: theme.yellow,
+                      fontSize: "14px",
+                    },
+                  }}
                 />
               }
               label={`${rating}+ Stars`}
-              sx={{ color: theme.white }}
+              sx={{
+                color: theme.white,
+                "& .MuiTypography-root": { fontSize: "12px" },
+                "&.MuiFormControlLabel-root": {
+                  width: "100%",
+                },
+              }}
             />
           ))}
         </AccordionDetails>
@@ -232,24 +223,6 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
           />
         </AccordionSummary>
         <AccordionDetails>
-          {/* <RadioGroup
-            value={filters.selectedOffer}
-            onChange={handleOfferChange}
-          >
-            {["10%", "20%", "30%"].map((offer) => (
-              <FormControlLabel
-                key={offer}
-                value={offer}
-                control={
-                  <Radio
-                    sx={{ "& .MuiSvgIcon-root": { color: theme.yellow } }}
-                  />
-                }
-                label={`${offer} Off`}
-                sx={{ color: theme.white }}
-              />
-            ))}
-          </RadioGroup> */}
           {["10%", "20%", "30%"].map((offer) => (
             <FormControlLabel
               key={offer}
@@ -262,11 +235,23 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
                       selectedOffer: prev.selectedOffer === offer ? "" : offer,
                     }))
                   }
-                  sx={{ "& .MuiSvgIcon-root": { color: theme.yellow } }}
+                  sx={{
+                    "& .MuiSvgIcon-root": {
+                      color: theme.yellow,
+                      fontSize: "16px",
+                    },
+                  }}
                 />
               }
               label={`${offer} Off`}
-              sx={{ color: theme.white }}
+              sx={{
+                color: theme.white,
+                width: "100&",
+                "& .MuiTypography-root": { fontSize: "12px" },
+                "&.MuiFormControlLabel-root": {
+                  width: "100%",
+                },
+              }}
             />
           ))}
         </AccordionDetails>

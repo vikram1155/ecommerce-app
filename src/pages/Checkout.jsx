@@ -53,11 +53,11 @@ function Checkout() {
         );
         setCartItems(allCartProducts?.data);
       } catch (error) {
-        console.log("Error fetching cart details");
+        dispatch(showSnackbar("Error fetching cart details"));
       }
     };
     getProductsInCartByUserFn();
-  }, [currentUser?.userId]);
+  }, [currentUser?.userId, dispatch]);
 
   // GET all products available
   useEffect(() => {
@@ -115,19 +115,20 @@ function Checkout() {
 
       if (response.status.code === 200) {
         try {
-          // UPDATE cart items = []
-          const clearCartResponse = await clearCartByUser({
+          const response = await clearCartByUser({
             userId: currentUser?.userId,
             userEmail: currentUser?.email,
             productsInCart: [],
           });
-          setButtonClick(true);
-          setTimeout(() => {
-            setOrderSuccessPage(true);
+          if (response.status.code === 200) {
+            setButtonClick(true);
             setTimeout(() => {
-              navigate("/");
+              setOrderSuccessPage(true);
+              setTimeout(() => {
+                navigate("/");
+              }, 5000);
             }, 5000);
-          }, 5000);
+          }
         } catch (error) {
           console.error("Failed to empty cart", error);
         }
@@ -141,11 +142,13 @@ function Checkout() {
     try {
       // UPDATE cart items after removing an item
       const response = await removeCartItem(currentUser.userId, id);
-      dispatch(showSnackbar("Product Removed from Cart!"));
+      if (response.status.code === 200) {
+        dispatch(showSnackbar("Product Removed from Cart!"));
 
-      setProductsInCart(productsInCart.filter((p) => p.productId !== id));
+        setProductsInCart(productsInCart.filter((p) => p.productId !== id));
+      }
     } catch (error) {
-      console.log("Error removing item from cart:", error);
+      dispatch(showSnackbar(`Error removing item from cart: ${error}`));
     }
   };
 
@@ -215,13 +218,14 @@ function Checkout() {
         >
           {productsInCart?.length > 0 ? (
             <>
-              {productsInCart?.map((item) => (
+              {productsInCart?.map((item, index) => (
                 <Box
                   display={"flex"}
                   gap={1}
                   alignItems={"center"}
                   justifyContent={"space-between"}
                   py={3}
+                  key={index}
                 >
                   <Box display={"flex"} gap={1} flexDirection={"column"}>
                     <Box

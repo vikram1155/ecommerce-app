@@ -4,10 +4,10 @@ import CustomProductCard from "./CustomProductCard";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { theme } from "../utils/theme";
 import CustomTypography from "./CustomTypography";
-import { getAllProducts, getFavorites, updateFavorites } from "../apiCalls/api";
+import { getFavorites, updateFavorites } from "../apiCalls/api";
 import { useDispatch } from "react-redux";
 import { showSnackbar } from "../redux/snackbarSlice";
-import TodayDeals from "./TodayDeals";
+import CustomSelect from "../customComponents/CustomSelect";
 
 const FilterChip = ({ label, onRemove }) => (
   <Box
@@ -40,6 +40,7 @@ function CustomProductList({
   setFilters,
   setFilteredProducts,
 }) {
+  const [selectedSort, setSelectedSort] = useState("");
   const isMobile = useMediaQuery("(max-width: 450px)");
 
   const handleRemoveFilter = (key, item) => {
@@ -71,15 +72,17 @@ function CustomProductList({
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const resp = await getFavorites(currentUser?.userId);
-        setFavoritesListFromLocal(resp?.data?.favorites || []);
+        const response = await getFavorites(currentUser?.userId);
+        if (response.status.code === 200) {
+          setFavoritesListFromLocal(response?.data?.favorites || []);
+        }
       } catch (error) {
         console.error("Failed to fetch favorites:", error);
       }
     };
 
     fetchFavorites();
-  }, []);
+  }, [currentUser?.userId]);
 
   const dispatch = useDispatch();
   const handleFavoriteButtonClick = async (id) => {
@@ -123,45 +126,72 @@ function CustomProductList({
         sx={{
           display: "flex",
           alignItems: "center",
-          gap: 1,
-          pb: 2,
-          flexFlow: "wrap",
+          justifyContent: "space-between",
+          pb: 3,
         }}
       >
-        {Object.entries(filters || {}).map(([key, value]) =>
-          key === "priceRange" &&
-          (filters.minMax[0] !== value[0] || filters.minMax[1] !== value[1]) ? (
-            value.map((item, index) => {
-              return (
-                item > 0 && (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            pt: 1,
+            flexFlow: "wrap",
+          }}
+        >
+          {Object.entries(filters || {}).map(([key, value]) =>
+            key === "priceRange" &&
+            (filters.minMax[0] !== value[0] ||
+              filters.minMax[1] !== value[1]) ? (
+              value.map((item, index) => {
+                return (
+                  item > 0 && (
+                    <FilterChip
+                      key={`${key}-${item}`}
+                      label={index === 0 ? `Min - ₹${item}` : `Max - ₹${item}`}
+                      onRemove={() => handleRemoveFilter(key, item)}
+                    />
+                  )
+                );
+              })
+            ) : key === "selectedCategories" ? (
+              value.map((item, index) => {
+                return (
                   <FilterChip
                     key={`${key}-${item}`}
-                    label={index === 0 ? `Min - ₹${item}` : `Max - ₹${item}`}
+                    label={item}
                     onRemove={() => handleRemoveFilter(key, item)}
                   />
-                )
-              );
-            })
-          ) : key === "selectedCategories" ? (
-            value.map((item, index) => {
-              return (
-                <FilterChip
-                  key={`${key}-${item}`}
-                  label={item}
-                  onRemove={() => handleRemoveFilter(key, item)}
-                />
-              );
-            })
-          ) : value && (key === "selectedRating" || key === "selectedOffer") ? (
-            <FilterChip
-              key={key}
-              label={
-                key === "selectedRating" ? `${value} ⭐` : `Above ${value}`
-              }
-              onRemove={() => handleRemoveFilter(key)}
-            />
-          ) : null
-        )}
+                );
+              })
+            ) : value &&
+              (key === "selectedRating" || key === "selectedOffer") ? (
+              <FilterChip
+                key={key}
+                label={
+                  key === "selectedRating" ? `${value} ⭐` : `Above ${value}`
+                }
+                onRemove={() => handleRemoveFilter(key)}
+              />
+            ) : null
+          )}
+        </Box>
+        <Box sx={{ width: "200px" }}>
+          <CustomSelect
+            label={selectedSort ? "" : "Sort Products"}
+            name={selectedSort ? "" : "Sort Products"}
+            value={selectedSort}
+            onChange={(e) => setSelectedSort(e.target.value)}
+            options={[
+              "Price: Low To High",
+              "Price: High To Low",
+              "Better Offers",
+              "Popularity",
+              "Top Rated",
+            ]}
+            required
+          />
+        </Box>
       </Box>
       {/* Grid for Product Cards */}
       {filteredProducts.length ? (
@@ -179,14 +209,35 @@ function CustomProductList({
                 },
           }}
         >
-          {filteredProducts.map((listItem) => (
-            <CustomProductCard
-              item={listItem}
-              setFilteredProducts={setFilteredProducts}
-              favoritesListFromLocal={favoritesListFromLocal}
-              handleFavoriteButtonClick={handleFavoriteButtonClick}
-            />
-          ))}
+          {filteredProducts
+            .sort((a, b) => {
+              if (selectedSort === "Price: Low To High") {
+                return a.price - b.price;
+              }
+              if (selectedSort === "Price: High To Low") {
+                return b.price - a.price;
+              }
+              if (selectedSort === "Better Offers") {
+                return b.offer - a.offer;
+              }
+              if (selectedSort === "Popularity") {
+                return b.no_of_ratings - a.no_of_ratings;
+              }
+              if (selectedSort === "Top Rated") {
+                return b.ratings - a.ratings;
+              }
+              return 0;
+            })
+            .map((listItem, index) => (
+              <Box key={index}>
+                <CustomProductCard
+                  item={listItem}
+                  setFilteredProducts={setFilteredProducts}
+                  favoritesListFromLocal={favoritesListFromLocal}
+                  handleFavoriteButtonClick={handleFavoriteButtonClick}
+                />
+              </Box>
+            ))}
         </Box>
       ) : (
         <Box

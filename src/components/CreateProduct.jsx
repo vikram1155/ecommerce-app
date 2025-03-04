@@ -17,7 +17,6 @@ const productFields = {
     { name: "category", label: "Category" },
     { name: "price", label: "Price", type: "number" },
     { name: "image", label: "Paste Image URL" },
-    // { name: "no_of_ratings", label: "Number of Ratings", type: "number" },
     { name: "description", label: "Description" },
     { name: "offer", label: "Offer (%)", type: "number" },
     { name: "features", label: "Features" },
@@ -64,7 +63,7 @@ const CreateProduct = ({
         veg_nonveg: null,
       }));
     }
-  }, [productData.type]);
+  }, [productData.type, setProductData]);
 
   const handleInputChange = (e, name) => {
     setProductData({ ...productData, [name || e.target.name]: e.target.value });
@@ -95,6 +94,8 @@ const CreateProduct = ({
       }),
     };
 
+    const urlRegex = /^(https?:\/\/)[\w.-]+(?:\.[\w.-]+)+[^\s]*$/;
+
     let errors = {};
 
     const allFields = [
@@ -113,7 +114,29 @@ const CreateProduct = ({
       } else if (type === "number" && (isNaN(value) || value === "")) {
         errors[name] = `${name.replace("_", " ")} should be a number`;
       }
+      if (name === "image" && !urlRegex.test(value)) {
+        errors[name] = "Invalid image URL";
+      }
     });
+
+    if (["Protein-Foods", "Supplements"].includes(productData.type)) {
+      ["protein", "carbs", "fat"].forEach((key) => {
+        if (
+          finalProductData[key] === "" ||
+          finalProductData[key] === null ||
+          isNaN(finalProductData[key])
+        ) {
+          errors[key] = `${key} should be a valid number`;
+        }
+      });
+    }
+
+    if (productData.type === "Protein-Foods") {
+      if (!["Veg", "Non-Veg"].includes(finalProductData.veg_nonveg)) {
+        errors["veg_nonveg"] =
+          "Veg/Non-Veg should be either 'Veg' or 'Non-Veg'";
+      }
+    }
 
     if (Object.keys(errors).length > 0) {
       setValidations(errors);
@@ -127,15 +150,16 @@ const CreateProduct = ({
         type === "create"
           ? await postProduct(finalProductData)
           : await updateProduct(finalProductData.productId, finalProductData);
-
-      dispatch(
-        showSnackbar(
-          type === "create"
-            ? "Product Created Sucessfully!"
-            : "Product Updated Sucessfully!"
-        )
-      );
-      handleCloseModal();
+      if (response.status.code === 200 || response.status.code === 201) {
+        dispatch(
+          showSnackbar(
+            type === "create"
+              ? "Product Created Sucessfully!"
+              : "Product Updated Sucessfully!"
+          )
+        );
+        handleCloseModal();
+      }
     } catch (error) {
       console.error(
         `Error ${type === "create" ? "creating" : "updating"} product:`,
@@ -174,7 +198,7 @@ const CreateProduct = ({
           <CustomTypography
             heading
             value={type === "create" ? "Create Product" : "Update Product"}
-            sx={{ fontSize: "16px", fontWeight: 600 }}
+            sx={{ fontSize: "14px", fontWeight: 600 }}
           />
           <IconButton onClick={handleCloseModal}>
             <CloseRoundedIcon sx={{ color: theme.yellow }} />
@@ -278,7 +302,6 @@ const CreateProduct = ({
         ) : (
           <></>
         )}
-        {/* {Object.entries(validations)?.[0]?.[1]} */}
       </Box>
     </Box>
   );

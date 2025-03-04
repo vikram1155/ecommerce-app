@@ -219,7 +219,7 @@ function Header() {
             sx={{ fontsize: "20px", cursor: "pointer", color: theme.yellow }}
           />
         </IconButton>
-        {adminAccess && (
+        {adminAccess.admin && (
           <IconButton onClick={() => navigate("/admin")}>
             <AdminPanelSettingsRoundedIcon
               sx={{ fontsize: "20px", cursor: "pointer", color: theme.yellow }}

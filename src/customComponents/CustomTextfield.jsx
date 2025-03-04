@@ -18,9 +18,11 @@ const CustomTextField = ({ label, name, value, onChange, sx, ...props }) => {
         borderRadius: "4px",
         "& .MuiOutlinedInput-input": {
           color: `${theme.white} !important`,
+          fontSize: "14px",
         },
         "& .MuiInputLabel-root": {
           color: `${theme.white} !important`,
+          fontSize: "14px",
         },
         "& .MuiInputLabel-outlined": {
           color: `${theme.white} !important`,

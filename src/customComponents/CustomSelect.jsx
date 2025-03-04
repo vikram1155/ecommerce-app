@@ -9,9 +9,11 @@ const CustomSelect = ({ label, name, value, onChange, options, ...props }) => {
         sx={{
           "&.MuiInputLabel-root.Mui-focused": {
             mt: 1,
+            // fontSize: "10px",
             color: theme.white,
           },
           "&.MuiInputLabel-root": {
+            fontSize: "14px",
             color: theme.white,
           },
         }}
@@ -34,6 +36,7 @@ const CustomSelect = ({ label, name, value, onChange, options, ...props }) => {
               p: "8.5px",
               backgroundColor: theme.darkGrey,
               color: theme.white,
+              fontSize: "14px",
             },
             "& .MuiSelect-icon": {
               color: theme.white,
@@ -50,7 +53,13 @@ const CustomSelect = ({ label, name, value, onChange, options, ...props }) => {
           }}
         >
           {options.map((option, index) => (
-            <MenuItem key={index} value={option}>
+            <MenuItem
+              key={index}
+              value={option}
+              sx={{
+                fontSize: "14px",
+              }}
+            >
               {option}
             </MenuItem>
           ))}

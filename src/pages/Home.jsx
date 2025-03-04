@@ -61,7 +61,7 @@ const Home = () => {
       try {
         const response = await getAllProducts();
         if (response?.data) {
-          setTodaysDealProducts(response.data); 
+          setTodaysDealProducts(response.data);
           dispatch(setProductsRedux(response.data));
         }
       } catch (error) {
@@ -114,6 +114,7 @@ const Home = () => {
               width: { xs: "calc(100% - 32px)", sm: "auto" },
               overflow: "hidden",
             }}
+            key={index}
           >
             <Box
               sx={{

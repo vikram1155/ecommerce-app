@@ -168,8 +168,8 @@ function Admin() {
             />
           </Box>
 
-          <Box>
-            <Box sx={{ boxShadow: 2, borderRadius: 2, background: theme.grey }}>
+          <Box sx={{ boxShadow: 2, borderRadius: 2, background: theme.grey }}>
+            {productsFromApi?.length ? (
               <List
                 sx={{
                   "&.MuiList-root": {
@@ -179,8 +179,9 @@ function Admin() {
                 }}
               >
                 {productsFromApi.map((product, index) => (
-                  <React.Fragment key={product.id}>
+                  <React.Fragment key={product.id || index}>
                     <ListItem
+                      key={product.productId || index}
                       sx={{
                         p: 3.5,
                         pt: 2,
@@ -237,7 +238,22 @@ function Admin() {
                   </React.Fragment>
                 ))}
               </List>
-            </Box>
+            ) : (
+              <Box
+                sx={{
+                  padding: "10px 40px 35px",
+                  maxWidth: 600,
+                  mx: "auto",
+                  background: theme.grey,
+                  borderRadius: 2,
+                  boxShadow: 3,
+                }}
+              >
+                <Typography variant="body1" sx={{ textAlign: "center", mt: 3 }}>
+                  No Products available!
+                </Typography>
+              </Box>
+            )}
           </Box>
         </Box>
       )}

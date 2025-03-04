@@ -21,21 +21,20 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import { theme } from "../utils/theme";
-import { addOrUpdateOrder } from "../redux/orderListSlice";
 import { showSnackbar } from "../redux/snackbarSlice";
 import TodayDeals from "../customComponents/TodayDeals";
 import CustomTypography from "../customComponents/CustomTypography";
 import CustomLoader from "../customComponents/CustomLoader";
 
-const COLORS = ["#FF0000", "#00C49F", "#FFBB28"]; // Red for Protein, Green for Carbs, Yellow for Fat
+const COLORS = ["#FF0000", "#00C49F", "#FFBB28"];
 
 function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
-  const [favorites, setFavorites] = useState([]);
   const [quantity, setQuantity] = useState(1);
   const isMobile = useMediaQuery("(max-width: 550px)");
   const isTab = useMediaQuery("(max-width: 1024px)");
+
   // Deals
   const [todaysDealProducts, setTodaysDealProducts] = useState();
 
@@ -110,7 +109,7 @@ function ProductDetail() {
     if (!product.inCart) {
       const toBeAddedInCart = {
         userId: currentUser.userId,
-        userEmail: currentUser.email, // Ensure email is sent
+        userEmail: currentUser.email,
         productsInCart: [
           {
             productId: product.productId,
@@ -122,10 +121,11 @@ function ProductDetail() {
       try {
         // CREATE - create cart items for an user
         const response = await postProductsInCartByUser(toBeAddedInCart);
-        dispatch(showSnackbar("Product Added to Cart!"));
-        console.log("Cart update response:", response);
+        if (response.status.code === 200) {
+          dispatch(showSnackbar("Product Added to Cart!"));
+        }
       } catch (error) {
-        console.log("Error adding to cart:", error);
+        dispatch(showSnackbar(`Error adding to cart: ${error}`));
       }
     }
 

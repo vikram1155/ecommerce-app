@@ -17,14 +17,16 @@ function Wishlist() {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const resp = await getFavorites(currentUser?.userId);
-        setFavoritesListFromLocal(resp?.data?.favorites || []);
+        const response = await getFavorites(currentUser?.userId);
+        if (response?.status?.code === 200) {
+          setFavoritesListFromLocal(response?.data?.favorites || []);
+        }
       } catch (error) {
         console.error("Failed to fetch favorites:", error);
       }
     };
     fetchFavorites();
-  }, []);
+  }, [currentUser?.userId]);
 
   const dispatch = useDispatch();
   const handleFavoriteButtonClick = async (id) => {
@@ -58,13 +60,14 @@ function Wishlist() {
           })
         );
       }
-      console.log("Updated favorites:", response);
     } catch (error) {
       console.error("Failed to update favorites:", error);
     }
   };
 
   useEffect(() => {
+    const currentUser = JSON.parse(localStorage.getItem("userinfo"));
+
     const fetchWishlist = async () => {
       if (!currentUser?.favorites?.length) {
         setWishList([]);
@@ -116,13 +119,15 @@ function Wishlist() {
             },
           }}
         >
-          {wishList.map((product) => (
-            <CustomProductCard
-              item={product}
-              setFilteredProducts={setWishList}
-              favoritesListFromLocal={favoritesListFromLocal}
-              handleFavoriteButtonClick={handleFavoriteButtonClick}
-            />
+          {wishList.map((product, index) => (
+            <Box key={index}>
+              <CustomProductCard
+                item={product}
+                setFilteredProducts={setWishList}
+                favoritesListFromLocal={favoritesListFromLocal}
+                handleFavoriteButtonClick={handleFavoriteButtonClick}
+              />
+            </Box>
           ))}
         </Box>
       ) : (

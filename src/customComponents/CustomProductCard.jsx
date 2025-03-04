@@ -5,7 +5,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { theme } from "../utils/theme";
 import CustomTypography from "./CustomTypography";
 import CustomButton from "./CustomButton";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import EquipmentsImage from "../assets/equipments.jpeg";
 import SupplementsImage from "../assets/supplements.jpeg";
 import ProteinFoodsImage from "../assets/proteinFoods.jpeg";

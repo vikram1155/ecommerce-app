@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useMediaQuery } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -13,6 +13,7 @@ import {
   getAllUsersFromApi,
   loginUserFromApi,
 } from "../apiCalls/api";
+import HeroSectionImage from "../assets/Header3.jpeg";
 import { showSnackbar } from "../redux/snackbarSlice";
 
 function LoginPage({ setAuthenticated }) {
@@ -79,10 +80,12 @@ function LoginPage({ setAuthenticated }) {
   }, [formData, isLogin]);
 
   // Validations
-  const isFormValid =
-    formErrors.length === 0 && Object.values(formData).every((val) => val);
-  const isFormFilled = Object.values(formData).every((val) => val);
+  const isFormFilled = Object.values(formData).every(
+    (val) => val !== "" && val !== null
+  );
+  // const isFormFilled = Object.values(f);
 
+  const isFormValid = formErrors.length === 0 && isFormFilled;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const isLoginFieldsFilled =
     isLogin &&
@@ -97,7 +100,6 @@ function LoginPage({ setAuthenticated }) {
       try {
         const allTeamMembers = await getAllUsersFromApi();
         setAllUsersFromAPI(allTeamMembers?.data);
-        // dispatch(setTeamMembers(getAllTeamMembers));
       } catch (error) {
         console.error("Error gettings tasks:", error);
       }
@@ -105,20 +107,21 @@ function LoginPage({ setAuthenticated }) {
     getAllUsersFromApiFn();
   }, [dispatch]);
 
-  const handleSubmit = async () => {
-    const authenticateUser = (userDetails) => {
-      localStorage.setItem("userinfo", JSON.stringify(userDetails));
-      localStorage.setItem("isAuthenticated", "true");
-      setAuthenticated(true);
-      navigate("/");
-    };
-    const handleApiError = (error) => {
-      const errorMessage =
-        error.response?.data?.detail || "Network error. Please try again.";
-      setError(errorMessage);
-    };
-    try {
-      if (isLogin) {
+  const authenticateUser = (userDetails) => {
+    localStorage.setItem("userinfo", JSON.stringify(userDetails));
+    localStorage.setItem("isAuthenticated", "true");
+    setAuthenticated(true);
+    navigate("/");
+  };
+  const handleApiError = (error) => {
+    const errorMessage =
+      error.response?.data?.detail || "Invalid Credentials, Try Again!";
+    setError(errorMessage);
+  };
+
+  const handleSubmit = async (isLogin) => {
+    if (isLogin) {
+      try {
         const response = await loginUserFromApi({
           email: formData.email,
           password: formData.password,
@@ -127,7 +130,11 @@ function LoginPage({ setAuthenticated }) {
           authenticateUser(response.data.userDetails);
           dispatch(showSnackbar("Logged In Successfully!"));
         }
-      } else if (!isLogin && formErrors?.length === 0) {
+      } catch (error) {
+        handleApiError(error);
+      }
+    } else {
+      try {
         const emailExists = allUsersFromAPI.some(
           (member) => member.email === formData.email
         );
@@ -148,170 +155,188 @@ function LoginPage({ setAuthenticated }) {
           authenticateUser(response.data);
           dispatch(showSnackbar("Signed Up Successfully!"));
         }
+      } catch (error) {
+        handleApiError(error);
       }
-    } catch (error) {
-      handleApiError(error);
     }
   };
 
   return (
-    <Box
-      sx={{
-        position: "absolute",
-        left: "50%",
-        top: "calc(50% - 37px)",
-        transform: "translate(-50%, -50%)",
-        maxWidth: "350px",
-        minWidth: "250px",
-        textAlign: "center",
-      }}
-    >
+    <Box>
       <Box
         sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundImage: `url(${HeroSectionImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          opacity: 0.35, // Setting the opacity here
+          //   zIndex: -1,
+          backgroundAttachment: "fixed",
+        }}
+      />
+      <Box
+        sx={{
+          position: "absolute",
+          left: "50%",
+          top: "calc(50% - 37px)",
+          transform: "translate(-50%, -50%)",
+          maxWidth: "350px",
+          minWidth: "250px",
           textAlign: "center",
-          pb: 6,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "16px",
         }}
       >
-        <CustomTypography heading={true} value="App Name" />
-        {/* <img src={taskHubLogo} alt="TaskHub Logo" style={{ width: "24px" }} /> */}
-      </Box>
-
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          p: 3,
-          border: `1px solid ${theme.yellow}`,
-          borderRadius: "8px",
-        }}
-      >
-        {/* Title */}
-        <CustomTypography value={isLogin ? "Login" : "Sign Up"} />
-
-        {/* Form */}
-        <Box component="form" noValidate sx={{ mt: 2 }}>
-          {!isLogin && (
-            <CustomTextField
-              label="Name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          )}
-
-          {/* {!isLogin && (
-            <CustomTextField
-              label="Role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              required
-            />
-          )} */}
-
-          {!isLogin && (
-            <CustomTextField
-              label="Age"
-              name="age"
-              value={formData.age}
-              onChange={handleChange}
-              required
-            />
-          )}
-
-          <CustomTextField
-            label="Email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            error={
-              formData.email &&
-              !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
-            }
-            helperText={
-              formData.email &&
-              !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
-                ? "Invalid email address"
-                : ""
-            }
+        <Box
+          sx={{
+            textAlign: "center",
+            pb: 6,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "16px",
+          }}
+        >
+          {/* <CustomTypography heading={true} value="STRENGTH HUB" /> */}
+          <Typography
+            variant={useMediaQuery("(max-width:550px)") ? "h5" : "h4"}
+            fontWeight={700}
+            gutterBottom
+            sx={{ textTransform: "uppercase" }}
+          >
+            Strength Hub
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            p: 3,
+            border: `1px solid ${theme.yellow}`,
+            borderRadius: "8px",
+            backgroundColor: "rgba(34, 34, 34, 0.5)",
+          }}
+        >
+          {/* Title */}
+          <CustomTypography
+            value={isLogin ? "Login" : "Sign Up"}
+            heading={true}
           />
-          {!isLogin && (
+
+          {/* Form */}
+          <Box component="form" noValidate sx={{ mt: 2 }}>
+            {!isLogin && (
+              <CustomTextField
+                label="Name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+            )}
+
+            {!isLogin && (
+              <CustomTextField
+                label="Age"
+                name="age"
+                value={formData.age}
+                onChange={handleChange}
+                required
+              />
+            )}
+
             <CustomTextField
-              label="Phone Number"
-              name="phone"
-              value={formData.phone}
+              label="Email"
+              name="email"
+              value={formData.email}
               onChange={handleChange}
               required
-              error={formData.phone && formData.phone.length !== 10}
+              error={
+                formData.email &&
+                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
+              }
               helperText={
-                formData.phone && formData.phone.length !== 10
-                  ? "Invalid Phone Number"
+                formData.email &&
+                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
+                  ? "Invalid email address"
                   : ""
               }
             />
-          )}
+            {!isLogin && (
+              <CustomTextField
+                label="Phone Number"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                error={formData.phone && formData.phone.length !== 10}
+                helperText={
+                  formData.phone && formData.phone.length !== 10
+                    ? "Invalid Phone Number"
+                    : ""
+                }
+              />
+            )}
 
-          <CustomTextField
-            label="Password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            type="password"
-          />
-
-          <Box
-            sx={{
-              width: "100%",
-              textAlign: "center",
-              display: "flex",
-              flexDirection: "column",
-              pt: 3,
-            }}
-          >
-            <CustomButton
-              variant="contained"
-              buttonText={isLogin ? "Login" : "Sign Up"}
-              onClick={handleSubmit}
-              disabled={isLogin ? !isLoginFieldsFilled : !isFormValid}
+            <CustomTextField
+              label="Password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              type="password"
             />
-            <Typography fontSize={12} color="red">
-              {!isLogin && isFormFilled && formErrors.length > 0
-                ? formErrors[0].error
-                : ""}
-            </Typography>
+
+            <Box
+              sx={{
+                width: "100%",
+                textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
+                pt: 3,
+              }}
+            >
+              <CustomButton
+                variant="contained"
+                buttonText={isLogin ? "Login" : "Sign Up"}
+                onClick={() => handleSubmit(isLogin)}
+                disabled={isLogin ? !isLoginFieldsFilled : !isFormValid}
+              />
+              <Typography fontSize={12} color="red">
+                {!isLogin && isFormFilled && formErrors.length > 0
+                  ? formErrors[0].error
+                  : ""}
+              </Typography>
+            </Box>
           </Box>
-        </Box>
 
-        {/* Toggle Login/Sign Up */}
-        <Typography variant="body2" sx={{ mt: 2 }}>
-          {isLogin ? "Don't have an account?" : "Already have an account?"}
-          <br></br>
-          <Link
-            component="button"
-            onClick={() => setIsLogin((prev) => !prev)}
-            style={{
-              fontWeight: "bold",
-              color: theme.yellow,
-            }}
-          >
-            {isLogin ? "Sign Up" : "Login"} here
-          </Link>
-        </Typography>
-
-        {/* Error Message */}
-        {error && (
-          <Typography sx={{ color: "red", mt: 2, fontSize: "10px" }}>
-            {error}!
+          {/* Toggle Login/Sign Up */}
+          <Typography variant="body2" sx={{ mt: 2, fontSize: "12px" }}>
+            {isLogin ? "Don't have an account?" : "Already have an account?"}
+            <br></br>
+            <Link
+              component="button"
+              onClick={() => setIsLogin((prev) => !prev)}
+              style={{
+                fontWeight: "bold",
+                color: theme.yellow,
+              }}
+            >
+              {isLogin ? "Sign Up" : "Login"} here
+            </Link>
           </Typography>
-        )}
+
+          {/* Error Message */}
+          {error && (
+            <Typography sx={{ color: "red", mt: 2, fontSize: "10px" }}>
+              {error}!
+            </Typography>
+          )}
+        </Box>
       </Box>
     </Box>
   );

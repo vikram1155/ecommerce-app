@@ -31,7 +31,7 @@ function TodayDeals({ todaysDealProducts }) {
       >
         {todaysDealProducts
           ?.filter((todaysDealProduct) => todaysDealProduct.offer >= 20)
-          .map((todaysDealProduct) => (
+          .map((todaysDealProduct, index) => (
             <Box
               sx={{ textAlign: "center" }}
               onClick={() => {
@@ -45,6 +45,7 @@ function TodayDeals({ todaysDealProducts }) {
                   }/${todaysDealProduct.productId}`
                 );
               }}
+              key={index}
             >
               <Box
                 sx={{
