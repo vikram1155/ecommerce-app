@@ -328,6 +328,24 @@ function Profile() {
           />
         </DialogActions>
       </Dialog>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          pt: 5,
+        }}
+      >
+        <CustomButton
+          buttonText={"Logout"}
+          variant={"contained"}
+          onClick={() => {
+            localStorage.removeItem("isAuthenticated");
+            localStorage.removeItem("userinfo");
+            window.location.href = "/";
+          }}
+        />
+      </Box>
     </Box>
   );
 }
