@@ -109,7 +109,7 @@ function CustomProductCard({
         <Box display={"flex"} gap={1} alignItems={"center"}>
           <CustomTypography
             heading={false}
-            value={`${item.price + (item.price * item.offer) / 100}`}
+            value={`${Math.round(item.price / ((100 - item.offer) / 100))}`}
             sx={{
               fontWeight: 400,
               fontSize: "12px",

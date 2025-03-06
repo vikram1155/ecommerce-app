@@ -39,7 +39,7 @@ function Checkout() {
 
   const totalPriceOffer = productsInCart.reduce(
     (sum, item) =>
-      sum + item.quantity * (item.price + (item.price * item.offer) / 100),
+      sum + item.quantity * Math.round(item.price / ((100 - item.offer) / 100)),
     0
   );
 
@@ -282,10 +282,9 @@ function Checkout() {
                   >
                     <CustomTypography
                       heading={false}
-                      value={`${
-                        item.quantity *
-                        (item.price + (item.price * item.offer) / 100)
-                      }`}
+                      value={`${Math.round(
+                        item.price / ((100 - item.offer) / 100)
+                      )}`}
                       sx={{
                         fontWeight: 400,
                         fontSize: "12px",

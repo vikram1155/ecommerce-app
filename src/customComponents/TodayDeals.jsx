@@ -105,7 +105,10 @@ function TodayDeals({ todaysDealProducts }) {
                 >
                   <CustomTypography
                     heading={false}
-                    value={todaysDealProduct.price}
+                    value={`${Math.round(
+                      todaysDealProduct.price /
+                        ((100 - todaysDealProduct.offer) / 100)
+                    )}`}
                     sx={{
                       fontWeight: 400,
                       fontSize: "12px",
@@ -115,10 +118,7 @@ function TodayDeals({ todaysDealProducts }) {
                   />
                   <CustomTypography
                     heading={false}
-                    value={`₹${
-                      todaysDealProduct.price -
-                      (todaysDealProduct.price * todaysDealProduct.offer) / 100
-                    }`}
+                    value={todaysDealProduct.price}
                     sx={{ fontWeight: 400, fontSize: "16px" }}
                   />
                   <CustomTypography

@@ -39,7 +39,7 @@ const Home = () => {
   const [randomQuote, setRandomQuote] = useState("");
 
   useEffect(() => {
-    const quote = quotes[Math.floor(Math.random() * quotes.length)];
+    const quote = quotes[Math.round(Math.random() * quotes.length)];
     setRandomQuote(quote);
   }, []);
 

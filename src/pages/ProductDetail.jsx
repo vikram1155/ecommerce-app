@@ -248,9 +248,9 @@ function ProductDetail() {
               <Box display={"flex"} gap={1} alignItems={"center"}>
                 <CustomTypography
                   heading={false}
-                  value={`${
-                    product.price + (product.price * product.offer) / 100
-                  }`}
+                  value={`${Math.round(
+                    product.price / ((100 - product.offer) / 100)
+                  )}`}
                   sx={{
                     fontWeight: 400,
                     fontSize: "12px",
