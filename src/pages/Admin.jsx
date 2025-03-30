@@ -9,6 +9,7 @@ import {
   Typography,
   Tabs,
   Tab,
+  CircularProgress,
 } from "@mui/material";
 import CustomButton from "../customComponents/CustomButton";
 import CreateProduct from "../components/CreateProduct";
@@ -44,16 +45,27 @@ function Admin() {
   const [selectedProduct, setSelectedProduct] = useState([]);
   const [allOrders, setAllOrders] = useState([]);
   const [type, setType] = useState("create");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersError, setOrdersError] = useState(null);
 
   useEffect(() => {
     const getAllProductsFn = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await getAllProducts();
         if (response?.data) {
           setProductsFromApi(response.data);
+        } else {
+          setProductsFromApi([]);
         }
       } catch (error) {
         console.error("Error fetching products:", error);
+        setError("Some error occurred while fetching products");
+      } finally {
+        setLoading(false);
       }
     };
     getAllProductsFn();
@@ -61,13 +73,20 @@ function Admin() {
 
   useEffect(() => {
     const getAllOrdersFn = async () => {
+      setOrdersLoading(true);
+      setOrdersError(null);
       try {
         const response = await getAllOrders();
         if (response?.data) {
           setAllOrders(response.data);
+        } else {
+          setAllOrders([]);
         }
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching orders:", error);
+        setOrdersError("Some error occurred while fetching orders");
+      } finally {
+        setOrdersLoading(false);
       }
     };
     getAllOrdersFn();
@@ -143,6 +162,7 @@ function Admin() {
           label="Manage Orders"
         />
       </Tabs>
+
       {tabIndex === 0 && (
         <Box>
           <Box
@@ -169,7 +189,26 @@ function Admin() {
           </Box>
 
           <Box sx={{ boxShadow: 2, borderRadius: 2, background: theme.grey }}>
-            {productsFromApi?.length ? (
+            {loading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+                <CircularProgress sx={{ color: theme.yellow }} />
+              </Box>
+            ) : error ? (
+              <Box
+                sx={{
+                  padding: "10px 40px 35px",
+                  maxWidth: 600,
+                  mx: "auto",
+                  background: theme.grey,
+                  borderRadius: 2,
+                  boxShadow: 3,
+                }}
+              >
+                <Typography variant="body1" sx={{ textAlign: "center", mt: 3 }}>
+                  {error}
+                </Typography>
+              </Box>
+            ) : productsFromApi.length ? (
               <List
                 sx={{
                   "&.MuiList-root": {
@@ -257,9 +296,31 @@ function Admin() {
           </Box>
         </Box>
       )}
+
       {tabIndex === 1 && (
         <Box>
-          <ManageOrders allOrders={allOrders} setAllOrders={setAllOrders} />
+          {ordersLoading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+              <CircularProgress sx={{ color: theme.yellow }} />
+            </Box>
+          ) : ordersError ? (
+            <Box
+              sx={{
+                padding: "10px 40px 35px",
+                maxWidth: 600,
+                mx: "auto",
+                background: theme.grey,
+                borderRadius: 2,
+                boxShadow: 3,
+              }}
+            >
+              <Typography variant="body1" sx={{ textAlign: "center", mt: 3 }}>
+                {ordersError}
+              </Typography>
+            </Box>
+          ) : (
+            <ManageOrders allOrders={allOrders} setAllOrders={setAllOrders} />
+          )}
         </Box>
       )}
 

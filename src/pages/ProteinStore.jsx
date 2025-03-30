@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import CustomFilterBox from "../customComponents/CustomFilterBox";
-import { Box, useMediaQuery } from "@mui/material";
+import { Box, useMediaQuery, CircularProgress } from "@mui/material";
 import CustomProductList from "../customComponents/CustomProductList";
 import { useDispatch } from "react-redux";
 import { getAllProducts } from "../apiCalls/api";
 import { setProductsRedux } from "../redux/allProductsSlice";
+import CustomTypography from "../customComponents/CustomTypography";
+import { theme } from "../utils/theme";
 
 function ProteinStore() {
   const [productsFromApi, setProductsFromApi] = useState([]);
@@ -18,24 +20,35 @@ function ProteinStore() {
     selectedOffer: "",
     minMax: [0, 0],
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
     const getAllProductsFn = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await getAllProducts();
         if (response?.data) {
-          setProductsFromApi(response.data); 
+          setProductsFromApi(response.data);
           dispatch(setProductsRedux(response.data));
+        } else {
+          setProductsFromApi([]);
         }
       } catch (error) {
         console.error("Error fetching products:", error);
+        setError("Some error occurred while fetching products");
+      } finally {
+        setLoading(false);
       }
     };
     getAllProductsFn();
   }, [dispatch]);
 
   useEffect(() => {
+    if (!productsFromApi.length) return;
+
     let min = Infinity;
     let max = -Infinity;
 
@@ -68,7 +81,7 @@ function ProteinStore() {
           equipment.price >= minPrice && equipment.price <= maxPrice;
         const matchesCategory =
           selectedCategories.length === 0 ||
-          selectedCategories.includes(equipment.category);
+          selectedCategories?.includes(equipment.category);
         const matchesRating =
           selectedRating === "" || equipment.ratings >= Number(selectedRating);
         const matchesOffer =
@@ -95,21 +108,61 @@ function ProteinStore() {
   // JSX
   return (
     <Box>
-      {!isMobile && (
-        <CustomFilterBox
-          filters={filters}
-          setFilters={setFilters}
-          categories={categories}
-        />
+      {loading ? (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+          <CircularProgress sx={{ color: theme.yellow }} />
+        </Box>
+      ) : error ? (
+        <Box
+          sx={{
+            display: "flex",
+            py: 3,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <CustomTypography
+            heading={false}
+            value={error}
+            sx={{ color: theme.white }}
+          />
+        </Box>
+      ) : (
+        <>
+          {!isMobile && (
+            <CustomFilterBox
+              filters={filters}
+              setFilters={setFilters}
+              categories={categories}
+            />
+          )}
+          <Box ml={!isMobile ? "250px" : "0"}>
+            {productsFromApi.length ? (
+              <CustomProductList
+                filteredProducts={filteredProducts}
+                filters={filters}
+                setFilters={setFilters}
+                setFilteredProducts={setFilteredProducts}
+              />
+            ) : (
+              <Box
+                sx={{
+                  display: "flex",
+                  py: 3,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <CustomTypography
+                  heading={false}
+                  value="No Products available!"
+                  sx={{ color: theme.white }}
+                />
+              </Box>
+            )}
+          </Box>
+        </>
       )}
-      <Box ml={!isMobile && "250px"}>
-        <CustomProductList
-          filteredProducts={filteredProducts}
-          filters={filters}
-          setFilters={setFilters}
-          setFilteredProducts={setFilteredProducts}
-        />
-      </Box>
     </Box>
   );
 }

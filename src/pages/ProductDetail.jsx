@@ -67,7 +67,7 @@ function ProductDetail() {
 
     const favoritesList = currentUser?.favorites ?? [];
 
-    const updatedFavoritesList = favoritesList.includes(id)
+    const updatedFavoritesList = favoritesList?.includes(id)
       ? favoritesList.filter((favId) => favId !== id)
       : [...favoritesList, id];
 
@@ -222,7 +222,7 @@ function ProductDetail() {
                   onClick={() => handleFavoriteButtonClick(product?.productId)}
                   color="error"
                 >
-                  {favoritesListFromLocal.includes(product.productId) ? (
+                  {favoritesListFromLocal?.includes(product.productId) ? (
                     <FavoriteIcon />
                   ) : (
                     <FavoriteBorderIcon />

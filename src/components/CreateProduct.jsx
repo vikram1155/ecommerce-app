@@ -119,7 +119,7 @@ const CreateProduct = ({
       }
     });
 
-    if (["Protein-Foods", "Supplements"].includes(productData.type)) {
+    if (["Protein-Foods", "Supplements"]?.includes(productData.type)) {
       ["protein", "carbs", "fat"].forEach((key) => {
         if (
           finalProductData[key] === "" ||
@@ -132,7 +132,7 @@ const CreateProduct = ({
     }
 
     if (productData.type === "Protein-Foods") {
-      if (!["Veg", "Non-Veg"].includes(finalProductData.veg_nonveg)) {
+      if (!["Veg", "Non-Veg"]?.includes(finalProductData.veg_nonveg)) {
         errors["veg_nonveg"] =
           "Veg/Non-Veg should be either 'Veg' or 'Non-Veg'";
       }

@@ -31,7 +31,7 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
     const category = event.target.value;
     setFilters((prev) => ({
       ...prev,
-      selectedCategories: prev.selectedCategories.includes(category)
+      selectedCategories: prev.selectedCategories?.includes(category)
         ? prev.selectedCategories.filter((c) => c !== category)
         : [...prev.selectedCategories, category],
     }));
@@ -138,7 +138,7 @@ function CustomFilterBox({ categories, onFilterChange, filters, setFilters }) {
                 control={
                   <Checkbox
                     value={category}
-                    checked={filters.selectedCategories.includes(category)}
+                    checked={filters.selectedCategories?.includes(category)}
                     onChange={handleCategoryChange}
                     sx={{
                       color: theme.white,

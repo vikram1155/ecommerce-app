@@ -64,7 +64,7 @@ function CustomProductCard({
           handleFavoriteButtonClick(item.productId);
         }}
       >
-        {favoritesListFromLocal.includes(item.productId) ? (
+        {favoritesListFromLocal?.includes(item.productId) ? (
           <FavoriteIcon />
         ) : (
           <FavoriteBorderIcon />

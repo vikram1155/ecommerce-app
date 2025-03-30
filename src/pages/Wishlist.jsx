@@ -78,7 +78,7 @@ function Wishlist() {
         const response = await getAllProducts();
         if (response?.data) {
           const filteredFavorites = response.data.filter((product) =>
-            currentUser.favorites.includes(product.productId)
+            currentUser.favorites?.includes(product.productId)
           );
           setWishList(filteredFavorites);
         }

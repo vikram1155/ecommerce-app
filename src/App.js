@@ -6,7 +6,6 @@ import {
   BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
-import About from "./pages/About";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Supplements from "./pages/Supplements";
@@ -46,10 +45,6 @@ function App() {
                 path="/login"
                 element={<LoginPage setAuthenticated={setAuthenticated} />}
               />
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            </>
-          ) : (
-            <>
               <Route
                 path="/"
                 element={
@@ -59,10 +54,62 @@ function App() {
                 }
               />
               <Route
-                path="/about"
+                path="/protein-store"
                 element={
                   <Layout>
-                    <About />
+                    <ProteinStore />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/supplements"
+                element={
+                  <Layout>
+                    <Supplements />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/equipments"
+                element={
+                  <Layout>
+                    <Equipments />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/protein-store/:id"
+                element={
+                  <Layout>
+                    <ProductDetail />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/supplements/:id"
+                element={
+                  <Layout>
+                    <ProductDetail />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/equipments/:id"
+                element={
+                  <Layout>
+                    <ProductDetail />
+                  </Layout>
+                }
+              />
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </>
+          ) : (
+            <>
+              <Route
+                path="/"
+                element={
+                  <Layout home={true}>
+                    <Home />
                   </Layout>
                 }
               />
